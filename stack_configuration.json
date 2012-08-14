@@ -2,7 +2,6 @@
   "bannedNicks": [
     "fred",
     "wilma",
-    "barney",
     "bambam"
   ],
   "defaultErrorReciever": "piglet@thoughtworks.com",
