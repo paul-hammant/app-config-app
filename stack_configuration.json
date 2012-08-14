@@ -1,0 +1,12 @@
+{
+  "bannedNicks": [
+    "fred",
+    "wilma",
+    "barney",
+    "bambam"
+  ],
+  "defaultErrorReciever": "piglet@thoughtworks.com",
+  "lighton": true,
+  "loadMaxPercent": "22",
+  "nextShutdownDate": "8/9/2012"
+}
