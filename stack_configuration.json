@@ -1,11 +1,11 @@
 {
+  "lighton": true,
+  "loadMaxPercent": "11",
   "bannedNicks": [
     "fred",
-    "wilma",
-    "bambam"
+    "bambam",
+    "dino"
   ],
   "defaultErrorReciever": "piglet@thoughtworks.com",
-  "lighton": true,
-  "loadMaxPercent": "22",
   "nextShutdownDate": "8/9/2012"
 }
