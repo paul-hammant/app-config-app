@@ -1,12 +1,13 @@
 {
-  "defaultErrorReciever": "piglet@thoughtworks.com",
-  "nextShutdownDate": "8/9/2012",
-  "loadMaxPercent": "99",
-  "lighton": true,
-  "bannedNicks": [
-    "bambam",
-    "dino",
-    "werwer",
-    "derek"
-  ]
+ "bannedNicks": [
+  "bambam",
+  "dino",
+  "werwer",
+  "derek",
+  "jjjj"
+ ],
+ "defaultErrorReciever": "piglet@thoughtworks.com",
+ "lighton": true,
+ "loadMaxPercent": "66",
+ "nextShutdownDate": "8/9/2012"
 }
