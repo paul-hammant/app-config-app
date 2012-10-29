@@ -38,16 +38,14 @@ class App < Sinatra::Application
   end
 
   post '/login' do
-    client = params[:username] + 'Client'
-    result = %x[p4 -u #{params[:username]} -P #{params[:password]} -c #{client} sync 2>&1]
+    result = sync params[:username], params[:password]
     if $? == 0
       session[:authenticated] = true
       session[:username] = params[:username]
       session[:password] = params[:password]
-      session[:client] = client
       redirect '/'
-    elsif result.include? "Client '#{client}' unknown" or result.include? "Perforce password (P4PASSWD) invalid or unset."
-      "The administrator needs to configure client '#{client}' for user '#{params[:username]}'"
+    elsif result.include? "Client '#{client_name params[:username]}' unknown" or result.include? "Perforce password (P4PASSWD) invalid or unset."
+      "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
     else
       "An unknown error occurred"
     end
@@ -75,6 +73,10 @@ class App < Sinatra::Application
     contents = %x[git pull | aha --no-header]
   end
 
+  get '/create' do
+
+  end
+
   get '/' do
     redirect "index.html"
   end
@@ -86,8 +88,17 @@ class App < Sinatra::Application
 
   get '/*' do
     resource = params[:splat][0]
+    extension = resource.split('.').pop
+
+    if extension == 'json'
+      content_type 'application/json'
+    elsif extension == 'html'
+      content_type 'text/html'
+    end
     file = File.open(resource, 'r')
-    file.read
+    content = file.read
+    file.close
+    content
   end
 
   post '/*' do
@@ -97,6 +108,21 @@ class App < Sinatra::Application
       file.write(request.body.read)
     end
     contents = %x[jshon -ISF ./#{resource}]
+  end
+
+  def p4(username, password)
+    username ||= session['username']
+    password ||= session['password']
+    "p4 -u #{username} -P #{password} -c #{client_name username}"
+  end
+
+  def sync(username, password)
+    %x[#{p4 username, password} sync 2>&1]
+  end
+
+  def client_name(username)
+    username ||= session['username']
+    username + 'Client'
   end
 end
 
