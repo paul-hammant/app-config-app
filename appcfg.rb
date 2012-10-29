@@ -70,9 +70,12 @@ class App < Sinatra::Application
     %x[#{cmd}]
   end
 
-  post '/pull' do
-    content_type 'text/html', :charset => 'utf-8'
-    %x[git pull | aha --no-header]
+  post '/sync' do
+    message, code = sync
+    haml :sync, :locals => {
+        :message => message,
+        :code => code
+    }
   end
 
   get '/' do

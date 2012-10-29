@@ -41,11 +41,11 @@
 		  });		    	
 	  };
 	  
-	  this.pull = function() {
-		  $xhr("post", "/pull", function(code, svrMessage) {
+	  this.sync = function() {
+		  $xhr("post", "/sync", function(code, svrMessage) {
 		      self.svrMessage = svrMessage;
 		  }, function(code, response) {
-		     alert("git pull failed");
+		     alert("git sync failed");
 		  });		    	
 	  };
 	  
@@ -99,7 +99,7 @@
   <button ng:click="save()">Overwrite Server Version of Config</button><br/>
   <button ng:disabled="{{!message}}" ng:click="commit()">Commit Changes</button> Commit Message: <input name="message"></input><br/> 
   <button ng:click="push()">Push Commits to remote repo</button><br/>
-  <button ng:click="pull()">Pull Commits from remote repo</button><br/><br/>
+  <button ng:click="sync()">Synchronize latest from repo</button><br/><br/>
   
   Last Server operation: <br/>  
   <div ng:bind="svrMessage | html:'unsafe'">
@@ -110,3 +110,5 @@
 
 
 </html>
+
+
