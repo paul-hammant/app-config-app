@@ -22,43 +22,82 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'rubygems'
+require 'haml'
 require 'sinatra'
 require 'json'
 
-set :public_folder, File.dirname(__FILE__) 
-set :port, 12345
+class App < Sinatra::Application
+  enable :sessions
 
-get '/diffs' do
-  content_type 'text/html', :charset => 'utf-8'
-  content = %x[git diff --word-diff=color | aha --no-header | egrep '<span style="color:(red|green);">']
-  content.gsub /\n/, '<br/>'
-end
-
-post '/push' do
-  content_type 'text/html', :charset => 'utf-8'
-  contents = %x[git push | aha --no-header]
-end
-
-post '/commit' do
-  cmd = "git commit -am '" + params[:message] + "' | aha --no-header"
-  content_type 'text/html', :charset => 'utf-8'
-  contents = %x[#{cmd}]
-end
-
-post '/pull' do
-  content_type 'text/html', :charset => 'utf-8'
-  contents = %x[git pull | aha --no-header]
-end
-
-get '/' do
-  redirect "index.html"
-end
-
-post '/*' do
-  rsrc = params[:splat][0]
-  FileUtils.mkdir_p(File.dirname(rsrc))
-  File.open(rsrc, 'w+') do |file|
-    file.write(request.body.read)
+  before do
+     redirect '/login' unless request.path_info == '/login' or session[:authenticated]
   end
-  contents = %x[jshon -ISF ./#{rsrc}]     
+
+  get '/login' do
+    haml :login
+  end
+
+  post '/login' do
+    client = params[:username] + 'Client'
+    result = %x[p4 -u #{params[:username]} -P #{params[:password]} -c #{client} sync 2>&1]
+    if $? == 0
+      session[:authenticated] = true
+      session[:username] = params[:username]
+      session[:password] = params[:password]
+      session[:client] = client
+      redirect '/'
+    elsif result.include? "Client '#{client}' unknown" or result.include? "Perforce password (P4PASSWD) invalid or unset."
+      "The administrator needs to configure client '#{client}' for user '#{params[:username]}'"
+    else
+      "An unknown error occurred"
+    end
+  end
+
+  get '/diffs' do
+    content_type 'text/html', :charset => 'utf-8'
+    content = %x[git diff --word-diff=color | aha --no-header | egrep '<span style="color:(red|green);">']
+    content.gsub /\n/, '<br/>'
+  end
+
+  post '/push' do
+    content_type 'text/html', :charset => 'utf-8'
+    contents = %x[git push | aha --no-header]
+  end
+
+  post '/commit' do
+    cmd = "git commit -am '" + params[:message] + "' | aha --no-header"
+    content_type 'text/html', :charset => 'utf-8'
+    contents = %x[#{cmd}]
+  end
+
+  post '/pull' do
+    content_type 'text/html', :charset => 'utf-8'
+    contents = %x[git pull | aha --no-header]
+  end
+
+  get '/' do
+    redirect "index.html"
+  end
+
+  get '/logout' do
+    session.clear
+    redirect '/'
+  end
+
+  get '/*' do
+    resource = params[:splat][0]
+    file = File.open(resource, 'r')
+    file.read
+  end
+
+  post '/*' do
+    resource = params[:splat][0]
+    FileUtils.mkdir_p(File.dirname(resource))
+    File.open(resource, 'w+') do |file|
+      file.write(request.body.read)
+    end
+    contents = %x[jshon -ISF ./#{resource}]
+  end
 end
+
+
