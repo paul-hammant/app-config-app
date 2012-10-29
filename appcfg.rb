@@ -75,10 +75,6 @@ class App < Sinatra::Application
     %x[git pull | aha --no-header]
   end
 
-  get '/create' do
-
-  end
-
   get '/' do
     redirect "index.html"
   end
@@ -89,12 +85,9 @@ class App < Sinatra::Application
   end
 
   get '/*' do
-    _, code = sync
-    if code != 0
-      redirect '/error'
-    end
+    try_sync
     resource = path_to params[:splat][0]
-    extension = resource.split('.').pop
+    extension = extension_of resource
     if extension == 'json'
       content_type 'application/json'
     elsif extension == 'html'
@@ -107,21 +100,43 @@ class App < Sinatra::Application
   end
 
   post '/*' do
-    _, code = sync
-    if code != 0
-      redirect '/error'
-    end
     resource = path_to params[:splat][0]
-    FileUtils.mkdir_p(File.dirname(resource))
+    try_sync
+    if File.exists? resource
+      try_edit resource
+    else
+      FileUtils.mkdir_p(File.dirname(resource))
+      try_add resource
+    end
     File.open(resource, 'w+') do |file|
       file.write(request.body.read)
     end
-    %x[jshon -ISF ./#{resource}]
+    if extension_of(resource) == 'json'
+      %x[jshon -ISF #{resource}]
+    end
+  end
+
+  def add(resource, username = nil, password = nil)
+    [%x[#{p4 username, password} add #{clean resource} 2>&1], $?]
+  end
+
+  def edit(resource, username = nil, password = nil)
+    [%x[#{p4 username, password} edit #{clean resource} 2>&1], $?]
+  end
+
+  def clean(resource)
+    if resource.include? "'"
+      raise 'Resource contains invalid characters'
+    end
+    "'#{resource}'"
   end
 
   def p4(username = nil, password = nil)
-    username ||= session['username']
-    password ||= session['password']
+    username ||= session[:username]
+    password ||= session[:password]
+    if /[^\w+\-\.]/.match(username) or /[^\w+\-\.]/.match(password)
+      raise 'Illegal characters in username or password'
+    end
     "p4 -u #{username} -P #{password} -c #{client_name username}"
   end
 
@@ -130,13 +145,38 @@ class App < Sinatra::Application
   end
 
   def path_to(resource, username = nil)
-    username ||= session['username']
+    username ||= session[:username]
     File.join(File.dirname(__FILE__), 'wc', username, resource)
   end
 
   def client_name(username = nil)
-    username ||= session['username']
+    username ||= session[:username]
     username + 'Client'
+  end
+
+  def extension_of(resource)
+    return resource.split('.').pop
+  end
+
+  def try_edit(resource, username = nil, password = nil)
+    _, code = edit resource, username, password
+    if code != 0
+      redirect '/error'
+    end
+  end
+
+  def try_add(resource, username = nil, password = nil)
+    _, code = add resource, username, password
+    if code != 0
+      redirect '/error'
+    end
+  end
+
+  def try_sync(username = nil, password = nil)
+    _, code = sync username, password
+    if code != 0
+      redirect '/error'
+    end
   end
 end
 
