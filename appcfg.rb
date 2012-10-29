@@ -25,8 +25,11 @@ require 'rubygems'
 require 'haml'
 require 'sinatra'
 require 'json'
+require 'rack/flash'
 
 class App < Sinatra::Application
+  use Rack::Flash
+
   configure do
     enable :sessions
   end
@@ -85,6 +88,12 @@ class App < Sinatra::Application
   get '/logout' do
     session.clear
     redirect '/'
+  end
+
+  get '/error' do
+    haml :error, :locals => {
+      :message => flash[:error]
+    }
   end
 
   get '/*' do
@@ -163,22 +172,25 @@ class App < Sinatra::Application
   end
 
   def try_edit(resource, username = nil, password = nil)
-    _, code = edit resource, username, password
+    message, code = edit resource, username, password
     if code != 0
+      flash[:error] = message
       redirect '/error'
     end
   end
 
   def try_add(resource, username = nil, password = nil)
-    _, code = add resource, username, password
+    message, code = add resource, username, password
     if code != 0
+      flash[:error] = message
       redirect '/error'
     end
   end
 
   def try_sync(username = nil, password = nil)
-    _, code = sync username, password
+    message, code = sync username, password
     if code != 0
+      flash[:error] = message
       redirect '/error'
     end
   end
