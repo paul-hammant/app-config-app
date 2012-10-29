@@ -10,6 +10,9 @@ Jshon: http://kmkeen.com/jshon/ (Homebrew can install this)
 Running it
 ----------
 
-ruby appcfg.rb
+``
+$ bundle install
+$ rackup
+``
 
-Then crank up your browser, and go to [http://localhost:12345](http://localhost:12345)
+Then crank up your browser, and go to [http://localhost:9292](http://localhost:9292)
