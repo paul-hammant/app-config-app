@@ -89,7 +89,11 @@ class App < Sinatra::Application
   end
 
   get '/*' do
-    resource = params[:splat][0]
+    _, code = sync
+    if code != 0
+      redirect '/error'
+    end
+    resource = path_to params[:splat][0]
     extension = resource.split('.').pop
     if extension == 'json'
       content_type 'application/json'
@@ -103,7 +107,11 @@ class App < Sinatra::Application
   end
 
   post '/*' do
-    resource = params[:splat][0]
+    _, code = sync
+    if code != 0
+      redirect '/error'
+    end
+    resource = path_to params[:splat][0]
     FileUtils.mkdir_p(File.dirname(resource))
     File.open(resource, 'w+') do |file|
       file.write(request.body.read)
@@ -111,17 +119,22 @@ class App < Sinatra::Application
     %x[jshon -ISF ./#{resource}]
   end
 
-  def p4(username, password)
+  def p4(username = nil, password = nil)
     username ||= session['username']
     password ||= session['password']
     "p4 -u #{username} -P #{password} -c #{client_name username}"
   end
 
-  def sync(username, password)
+  def sync(username = nil, password = nil)
     [%x[#{p4 username, password} sync 2>&1], $?]
   end
 
-  def client_name(username)
+  def path_to(resource, username = nil)
+    username ||= session['username']
+    File.join(File.dirname(__FILE__), 'wc', username, resource)
+  end
+
+  def client_name(username = nil)
     username ||= session['username']
     username + 'Client'
   end
