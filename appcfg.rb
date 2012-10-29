@@ -79,7 +79,7 @@ class App < Sinatra::Application
   end
 
   get '/' do
-    redirect "index.html"
+    redirect 'index.html'
   end
 
   get '/logout' do
@@ -104,6 +104,9 @@ class App < Sinatra::Application
 
   post '/*' do
     resource = path_to params[:splat][0]
+    if extension_of(resource) != 'json'
+      raise 'Only JSON files may be edited'
+    end
     try_sync
     if File.exists? resource
       try_edit resource
@@ -114,9 +117,7 @@ class App < Sinatra::Application
     File.open(resource, 'w+') do |file|
       file.write(request.body.read)
     end
-    if extension_of(resource) == 'json'
-      %x[jshon -ISF #{resource}]
-    end
+    %x[jshon -ISF #{resource}]
   end
 
   def add(resource, username = nil, password = nil)
