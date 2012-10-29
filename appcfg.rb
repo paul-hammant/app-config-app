@@ -27,7 +27,9 @@ require 'sinatra'
 require 'json'
 
 class App < Sinatra::Application
-  enable :sessions
+  configure do
+    enable :sessions
+  end
 
   before do
      redirect '/login' unless request.path_info == '/login' or session[:authenticated]
@@ -38,13 +40,13 @@ class App < Sinatra::Application
   end
 
   post '/login' do
-    result = sync params[:username], params[:password]
-    if $? == 0
+    message, code = sync params[:username], params[:password]
+    if code == 0
       session[:authenticated] = true
       session[:username] = params[:username]
       session[:password] = params[:password]
       redirect '/'
-    elsif result.include? "Client '#{client_name params[:username]}' unknown" or result.include? "Perforce password (P4PASSWD) invalid or unset."
+    elsif message.include? "Client '#{client_name params[:username]}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
       "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
     else
       "An unknown error occurred"
@@ -59,18 +61,18 @@ class App < Sinatra::Application
 
   post '/push' do
     content_type 'text/html', :charset => 'utf-8'
-    contents = %x[git push | aha --no-header]
+    %x[git push | aha --no-header]
   end
 
   post '/commit' do
     cmd = "git commit -am '" + params[:message] + "' | aha --no-header"
     content_type 'text/html', :charset => 'utf-8'
-    contents = %x[#{cmd}]
+    %x[#{cmd}]
   end
 
   post '/pull' do
     content_type 'text/html', :charset => 'utf-8'
-    contents = %x[git pull | aha --no-header]
+    %x[git pull | aha --no-header]
   end
 
   get '/create' do
@@ -89,11 +91,10 @@ class App < Sinatra::Application
   get '/*' do
     resource = params[:splat][0]
     extension = resource.split('.').pop
-
     if extension == 'json'
       content_type 'application/json'
     elsif extension == 'html'
-      content_type 'text/html'
+      content_type 'text/html', :charset => 'utf-8'
     end
     file = File.open(resource, 'r')
     content = file.read
@@ -107,7 +108,7 @@ class App < Sinatra::Application
     File.open(resource, 'w+') do |file|
       file.write(request.body.read)
     end
-    contents = %x[jshon -ISF ./#{resource}]
+    %x[jshon -ISF ./#{resource}]
   end
 
   def p4(username, password)
@@ -117,7 +118,7 @@ class App < Sinatra::Application
   end
 
   def sync(username, password)
-    %x[#{p4 username, password} sync 2>&1]
+    [%x[#{p4 username, password} sync 2>&1], $?]
   end
 
   def client_name(username)
