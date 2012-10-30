@@ -1,114 +1,126 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html lang="en" xmlns:ng="http://angularjs.org">
+<!doctype html>
+<html lang="en" data-ng-app="appcfg">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title>Configuration application (alpha)</title>
-  <script type="text/javascript" ng:autobind src="http://code.angularjs.org/0.9.19/angular-0.9.19.min.js"></script>
-</head>
-<body ng:controller="AppCfg">
-  
-<script type="text/javascript">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Configuration application (alpha)</title>
+    <script type="text/javascript" src="http://code.angularjs.org/1.1.0/angular.js"></script>
+    <script type="text/javascript" src="http://code.angularjs.org/1.1.0/angular-resource.js"></script>
+    <script type="text/javascript">
+        //<![CDATA[
 
-    function AppCfg($resource, $xhr) {		
-      var self = this;
-	  this.newNickname = "";
-	  this.statusMessage;
-	  this.message;
-      this.cfg = $resource("stack_configuration.json").get({});
-    
-      this.save = function() {
-        self.cfg.$save(function() {
-          alert('config saved to server');
-        }, function() {
-          alert('ERROR on save');
+        angular.module("appcfg", ["ngResource"]).factory("StackCfg", function ($resource) {
+            return $resource("stack_configuration.json");
         });
-      };
 
-	  this.diffs = function() {		  
-		  $xhr("get", "/diffs/stack_configuration.json", function(code, serverMessage) {
-		      self.statusMessage = serverMessage;
-		  }, function(code, response) {
-		     alert("Diff failed");
-		  });		    	
-	  };
-	  
-	  this.commit = function() {		  
-		  $xhr("post", "/commit?message=" + self.message, function(code, serverMessage) {
-		      self.statusMessage = serverMessage;
-		  }, function(code, response) {
-		     alert("git commit failed");
-		  });		    	
-	  };
-	  
-	  this.sync = function() {
-		  $xhr("post", "/sync", function(code, svrMessage) {
-		      self.statusMessage = svrMessage;
-		  }, function(code, response) {
-		     alert("Sync failed");
-		  });		    	
-	  };
-          
-          this.revert = function() {              
-                  $xhr("post", "/revert/stack_configuration.json", function(code, serverMessage) {
-                      self.cfg.$get({}, function() {
-                          self.statusMessage = serverMessage;
-                      }, function(code, response) {
-                          alert("Revert succeeded, reload failed");
-                      });
-                  }, function(code, response) {
-                     alert("Revert failed");
-                  });
-          };
-	  
-      this.newNick = function() {
-        self.cfg.bannedNicks.push(self.newNickname);
-		self.newNickname = "";
-      };	  
-	  
-      this.deleteNick = function(nick) {
-	      var oldBannedNicks = self.cfg.bannedNicks;
-	      self.cfg.bannedNicks = [];
-	      angular.forEach(oldBannedNicks, function(n) {
-	        if (nick != n) self.cfg.bannedNicks.push(n);
-	      });
-      };	  	  
-	    	  
-    }
+        function AppCfg($scope, $http, StackCfg) {
+            $scope.newNickname = "";
+            $scope.statusMessage = "";
+            $scope.message = "";
+            $scope.cfg = StackCfg.get();
 
-    AppCfg.$inject = ["$resource", "$xhr"];
-    	
-</script>  
+            $scope.save = function () {
+                $scope.cfg.$save(function () {
+                    alert('config saved to server');
+                }, function () {
+                    alert('ERROR on save');
+                });
+            };
 
-  Light is on:  <input type="checkbox" name="cfg.lighton"> <br/>
-  
-  Default Error Reciever (email): <input name="cfg.defaultErrorReciever" ng:validate="email"/> <br/>
-  
-  Max Load Percentage: <input name="cfg.loadMaxPercent" ng:validate="number:0:100"/> <br/>
-  
-  Next Shutdown Date: <input name="cfg.nextShutdownDate" ng:validate="date"/> <br/>
-  
-  Banned nicks: 
-      <ol>
-	      <li ng:repeat="nick in cfg.bannedNicks"><span>{{nick}}&nbsp;&nbsp;<a ng:click="deleteNick(nick)">[X]</a></span></li>
-	  </ol>
-  <form ng:submit="newNick()">
-    <input type="text" name="newNickname" size="20">
+            $scope.diffs = function () {
+                $http.get("/diffs/stack_configuration.json").success(function (response) {
+                    $scope.statusMessage = response;
+                }).failure(function () {
+                    alert("Diff failed");
+                });
+            };
+
+            $scope.commit = function () {
+                $http.post("/commit?message=" + $scope.message).success(function (response) {
+                    $scope.statusMessage = response;
+                }).failure(function (code, response) {
+                    alert("git commit failed");
+                });
+            };
+
+            $scope.sync = function () {
+                $http.post("/sync").success(function (response) {
+                    $scope.statusMessage = response;
+                }).failure(function (response) {
+                    alert("Sync failed");
+                });
+            };
+
+            $scope.revert = function () {
+                $http.post("/revert/stack_configuration.json").success(function (response) {
+                    $scope.cfg.$get({}, function () {
+                        $scope.statusMessage = response;
+                    }, function (code, response) {
+                        alert("Revert succeeded, reload failed");
+                    });
+                }).failure(function (response) {
+                    alert("Revert failed");
+                });
+            };
+
+            $scope.newNick = function () {
+                $scope.cfg.bannedNicks.push($scope.newNickname);
+                $scope.newNickname = "";
+            };
+
+            $scope.deleteNick = function (nick) {
+                var oldBannedNicks = $scope.cfg.bannedNicks;
+                $scope.cfg.bannedNicks = [];
+                angular.forEach(oldBannedNicks, function (n) {
+                    if (nick != n) $scope.cfg.bannedNicks.push(n);
+                });
+            };
+        }
+
+        //]]>
+    </script>
+</head>
+<body data-ng-controller="AppCfg">
+
+Light is on: <input type="checkbox" data-ng-model="cfg.lighton">
+<br/>
+
+Default Error Reciever (email): <input data-ng-model="cfg.defaultErrorReciever" data-ng-validate="email"/>
+<br/>
+
+Max Load Percentage: <input data-ng-model="cfg.loadMaxPercent" data-ng-validate="number:0:100"/>
+<br/>
+
+Next Shutdown Date: <input data-ng-model="cfg.nextShutdownDate" data-ng-validate="date"/>
+<br/>
+
+Banned nicks:
+<ol>
+    <li data-ng-repeat="nick in cfg.bannedNicks">
+        <span>{{nick}}&nbsp;&nbsp;<a ng-click="deleteNick(nick)">[X]</a></span>
+    </li>
+</ol>
+
+<form data-ng-submit="newNick()">
+    <input type="text" data-ng-model="newNickname" size="20">
     <input type="submit" value="&lt;-- Add Nick"><br>
-  </form>	  
-  
-  <hr/>
-  
-  <button ng:click="save()">Save Changes</button><br/>
-  <button ng:click="diffs()">Show Diffs</button><br/>
-  <button ng:click="revert()">Revert Changes</button><br/>
-  <button ng:disabled="{{!message}}" ng:click="commit()">Commit Changes</button> Commit Message: <input name="message" type="text"/><br/>
-  <button ng:click="sync()">Sync Working Copy</button><br/><br/>
+</form>
 
-  <div ng:bind="statusMessage | html:'unsafe'"></div>
-  
+<button data-ng-click="save()">Save Changes</button>
+<br/>
+
+<button data-ng-click="diffs()">Show Diffs</button>
+<br/>
+
+<button data-ng-click="revert()">Revert Changes</button>
+<br/>
+
+<button data-ng-disabled="{{!message}}" data-ng-click="commit()">Commit Changes</button>
+Commit Message: <input data-ng-model="message" type="text"/><br/>
+
+<button data-ng-click="sync()">Sync Working Copy</button>
+<br/><br/>
+
+<div data-ng-bind-html-unsafe="statusMessage"></div>
+
 </body>
-
-
 </html>
-
