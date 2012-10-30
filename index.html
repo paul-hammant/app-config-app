@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-ng-app="appcfg">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Configuration application (alpha)</title>
     <script type="text/javascript" src="http://code.angularjs.org/1.1.0/angular.js"></script>
     <script type="text/javascript" src="http://code.angularjs.org/1.1.0/angular-resource.js"></script>
@@ -81,28 +81,33 @@
 </head>
 <body data-ng-controller="AppCfg">
 
-Light is on: <input type="checkbox" data-ng-model="cfg.lighton">
+<label for="lighton">Light is on:</label>
+<input type="checkbox" data-ng-model="cfg.lighton" id="lighton"/>
 <br/>
 
-Default Error Reciever (email): <input data-ng-model="cfg.defaultErrorReciever" data-ng-validate="email"/>
+<label for="defaultErrorReciever">Default Error Reciever (email):</label>
+<input data-ng-model="cfg.defaultErrorReciever" data-ng-validate="email" id="defaultErrorReciever"/>
 <br/>
 
-Max Load Percentage: <input data-ng-model="cfg.loadMaxPercent" data-ng-validate="number:0:100"/>
+<label for="loadMaxPercent">Max Load Percentage:</label>
+<input data-ng-model="cfg.loadMaxPercent" data-ng-validate="number:0:100" id="loadMaxPercent"/>
 <br/>
 
-Next Shutdown Date: <input data-ng-model="cfg.nextShutdownDate" data-ng-validate="date"/>
+<label for="nextShutdownDate">Next Shutdown Date:</label>
+<input data-ng-model="cfg.nextShutdownDate" data-ng-validate="date" id="nextShutdownDate"/>
 <br/>
 
 Banned nicks:
 <ol>
     <li data-ng-repeat="nick in cfg.bannedNicks">
-        <span>{{nick}}&nbsp;&nbsp;<a ng-click="deleteNick(nick)">[X]</a></span>
+        <span>{{nick}}&nbsp;&nbsp;<a data-ng-click="deleteNick(nick)">[X]</a></span>
     </li>
 </ol>
 
 <form data-ng-submit="newNick()">
-    <input type="text" data-ng-model="newNickname" size="20">
-    <input type="submit" value="&lt;-- Add Nick"><br>
+    <label for="newNickname">Ban Nickname:</label>
+    <input type="text" data-ng-model="newNickname" size="20" id="newNickname"/>
+    <input type="submit" value="&lt;-- Add Nick"/><br>
 </form>
 
 <button data-ng-click="save()">Save Changes</button>
@@ -115,7 +120,9 @@ Banned nicks:
 <br/>
 
 <button data-ng-disabled="{{!message}}" data-ng-click="commit()">Commit Changes</button>
-Commit Message: <input data-ng-model="message" type="text"/><br/>
+<label for="message">Commit Message:</label>
+<input data-ng-model="message" type="text" id="message"/>
+<br/>
 
 <button data-ng-click="sync()">Sync Working Copy</button>
 <br/><br/>
