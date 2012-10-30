@@ -102,7 +102,7 @@
   <button ng:click="save()">Save Changes</button><br/>
   <button ng:click="diffs()">Show Diffs</button><br/>
   <button ng:click="revert()">Revert Changes</button><br/>
-  <button ng:disabled="{{!message}}" ng:click="commit()">Commit Changes</button> Commit Message: <input name="message"></input><br/> 
+  <button ng:disabled="{{!message}}" ng:click="commit()">Commit Changes</button> Commit Message: <input name="message" type="text"/><br/>
   <button ng:click="sync()">Sync Working Copy</button><br/><br/>
 
   <div ng:bind="statusMessage | html:'unsafe'"></div>
