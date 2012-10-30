@@ -1,12 +1,26 @@
 %h1 Pending Changes
 
-- if edited_files.length > 0
-  %ul
-    - edited_files.each do |edited_file|
-      %li
-        %strong #{edited_file[:filename]}
-        %pre
-          :escaped
-            #{edited_file[:diffs]}
-- else
+- if edited_files.length == 0
+
   %p No changes pending.
+
+- else
+
+  %form{action: '/commit', method: 'post'}
+    %label{for: 'message'} Commit Message:
+    %input#message{type: 'text', name: 'message'}
+    %input{type: 'submit', value: 'Commit Changes'}
+
+  %table
+    - edited_files.each do |edited_file|
+      %tr
+        %td
+          %strong #{edited_file[:filename]}
+        %td
+          %form{action: "/revert/#{edited_file[:filename]}?return_to=/changes", method: 'post'}
+            %input{type: 'submit', value: 'Revert Changes'}
+      %tr
+        %td{colspan: 2}
+          %pre
+            :escaped
+              #{edited_file[:diffs]}

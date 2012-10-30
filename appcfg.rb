@@ -39,6 +39,12 @@ class App < Sinatra::Application
     try_p4sync if session[:authenticated]
   end
 
+  after do
+    if params[:return_to] and params[:return_to].start_with? '/'
+      redirect params[:return_to]
+    end
+  end
+
   get '/' do
     redirect 'index.html'
   end
