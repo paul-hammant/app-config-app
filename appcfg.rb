@@ -36,7 +36,7 @@ class App < Sinatra::Application
 
   before do
     redirect '/login' unless request.path_info == '/login' or session[:authenticated]
-    try_p4sync unless request.path_info == '/sync'
+    try_p4sync if session[:authenticated]
   end
 
   get '/' do
@@ -45,7 +45,7 @@ class App < Sinatra::Application
 
   get '/changes' do
     haml :changes, locals: {
-      edited_files: parse_diffs(try_p4diff)
+        edited_files: parse_diffs(try_p4diff)
     }
   end
 
@@ -59,8 +59,8 @@ class App < Sinatra::Application
     resource_short = params[:splat][0]
     resource = path_to resource_short
     haml :diffs, locals: {
-      filename: resource_short,
-      diffs: diffs_for(resource),
+        filename: resource_short,
+        diffs: diffs_for(resource),
     }
   end
 
@@ -109,8 +109,8 @@ class App < Sinatra::Application
   post '/sync' do
     message, code = p4sync
     haml :sync, locals: {
-      message: message,
-      code: code
+        message: message,
+        code: code
     }
   end
 
@@ -143,6 +143,7 @@ class App < Sinatra::Application
       file.write(request.body.read)
     end
     %x[jshon -ISF #{resource}]
+    status 204 if params[:nocontent]
   end
 
   def client_name(username = nil)
@@ -184,9 +185,9 @@ class App < Sinatra::Application
     resource.split('.').pop
   end
 
-  def p4
-    username = session[:username]
-    password = session[:password]
+  def p4(username = nil, password = nil)
+    username ||= session[:username]
+    password ||= session[:password]
     ensure_words username, 'username'
     ensure_words password, 'password'
     "p4 -u #{username} -P #{password} -c #{client_name username}"
@@ -208,8 +209,8 @@ class App < Sinatra::Application
     [%x[#{p4} revert #{ensure_escaped resource} 2>&1], $?]
   end
 
-  def p4sync
-    [%x[#{p4} sync 2>&1], $?]
+  def p4sync(username = nil, password = nil)
+    [%x[#{p4 username, password} sync 2>&1], $?]
   end
 
   def parse_diffs(diffs)
@@ -217,8 +218,8 @@ class App < Sinatra::Application
     diffs.lines.each do |line|
       if matches = /^==== .+#{Regexp.escape working_copy}\/(.+) ====$/.match(line)
         files.push({
-          filename: matches[1],
-          diffs: '',
+            filename: matches[1],
+            diffs: '',
         })
       elsif files[-1]
         files[-1][:diffs] += line
