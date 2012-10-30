@@ -1,11 +1,9 @@
 Installation
 ------------
 
-Ruby Gems needed: json & sinatra
-
-AHA (you'll have to build this one from source): https://github.com/theZiz/aha
-
 Jshon: http://kmkeen.com/jshon/ (Homebrew can install this)
+
+All other dependencies are in the Gemfile.
 
 Running it
 ----------
