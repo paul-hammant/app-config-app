@@ -1,10 +1,12 @@
 %h1 Pending Changes
 
-%ul
-  - edited_files.each do |edited_file|
-    %li
-      %strong #{edited_file[:filename]}
-      %pre
-        :escaped
-          #{edited_file[:diffs]}
-
+- if edited_files.length > 0
+  %ul
+    - edited_files.each do |edited_file|
+      %li
+        %strong #{edited_file[:filename]}
+        %pre
+          :escaped
+            #{edited_file[:diffs]}
+- else
+  %p No changes pending.

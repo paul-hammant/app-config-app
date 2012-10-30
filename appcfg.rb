@@ -220,7 +220,7 @@ class App < Sinatra::Application
           filename: matches[1],
           diffs: '',
         })
-      else
+      elsif files[-1]
         files[-1][:diffs] += line
       end
     end
