@@ -40,9 +40,7 @@ class App < Sinatra::Application
   end
 
   after do
-    if params[:return_to] and params[:return_to].start_with? '/'
-      redirect params[:return_to]
-    end
+    redirect params[:return_to] if params[:return_to] and params[:return_to].start_with? '/'
   end
 
   get '/' do
@@ -56,9 +54,10 @@ class App < Sinatra::Application
   end
 
   post '/commit' do
-    cmd = "git commit -am '" + params[:message] + "' | aha --no-header"
-    content_type 'text/html', :charset => 'utf-8'
-    %x[#{cmd}]
+    raise "No message entered" unless params[:message].length > 0
+    haml :commit, locals: {
+        message: (try p4commit params[:message])
+    }
   end
 
   get '/diffs/*' do
@@ -66,7 +65,7 @@ class App < Sinatra::Application
     resource = path_to resource_short
     haml :diffs, locals: {
         filename: resource_short,
-        diffs: diffs_for(resource),
+        diffs: (diffs_for resource),
     }
   end
 
@@ -146,7 +145,7 @@ class App < Sinatra::Application
       try p4add resource
     end
     File.open(resource, 'w+') do |file|
-      file.write(request.body.read)
+      file.write request.body.read
     end
     %x[jshon -ISF #{resource}]
     status 204 if params[:nocontent]
@@ -200,6 +199,12 @@ class App < Sinatra::Application
 
   def p4add(resource)
     [%x[#{p4} add #{ensure_escaped resource} 2>&1], $?]
+  end
+
+  def p4commit(message)
+    message = message.gsub /\s+/, ' '
+    message = message.gsub /"/, '\''
+    [%x[#{p4} submit -d "#{message}" 2>&1], $?]
   end
 
   def p4diff(file = nil)
