@@ -166,7 +166,8 @@ class App < Sinatra::Application
   end
 
   def ensure_escaped(resource)
-    if resource.include? "'" and resource.include? '"'
+    if /[\t\f\r\n\a&\|<>:;\*\?!%\$\^`~@#\[\]\(\)\{\}\+=\\]/.match resource or
+        resource.include? '..' or (resource.include? '"' and resource.include? "'")
       raise 'Resource contains invalid characters'
     elsif resource.include? "'"
       "\"#{resource}\""
@@ -174,8 +175,6 @@ class App < Sinatra::Application
       "'#{resource}'"
     elsif resource.include? ' '
       "'#{resource}'"
-    elsif /\s/.match resource
-      raise 'Resource contains invalid characters'
     else
       resource
     end
