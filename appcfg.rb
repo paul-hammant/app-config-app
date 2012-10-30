@@ -36,7 +36,7 @@ class App < Sinatra::Application
 
   before do
     redirect '/login' unless request.path_info == '/login' or session[:authenticated]
-    try_p4sync if session[:authenticated]
+    try p4sync if session[:authenticated]
   end
 
   after do
@@ -51,7 +51,7 @@ class App < Sinatra::Application
 
   get '/changes' do
     haml :changes, locals: {
-        edited_files: parse_diffs(try_p4diff)
+        edited_files: parse_diffs(try p4diff)
     }
   end
 
@@ -106,7 +106,7 @@ class App < Sinatra::Application
 
   post '/revert/*' do
     resource = params[:splat][0]
-    try_p4revert path_to resource
+    try p4revert path_to resource
     haml :revert, locals: {
         filename: resource
     }
@@ -139,11 +139,11 @@ class App < Sinatra::Application
       raise 'Only JSON files may be edited'
     end
     if File.exists? resource
-      try_p4edit resource
+      try p4edit resource
     else
       FileUtils.mkdir_p File.dirname resource
       FileUtils.touch resource
-      try_p4add resource
+      try p4add resource
     end
     File.open(resource, 'w+') do |file|
       file.write(request.body.read)
@@ -157,7 +157,7 @@ class App < Sinatra::Application
   end
 
   def diffs_for(resource)
-    diffs = parse_diffs try_p4diff resource
+    diffs = parse_diffs try p4diff resource
     if diffs.length and diffs[0]
       diffs[0][:diffs]
     else
@@ -234,53 +234,19 @@ class App < Sinatra::Application
     files
   end
 
+  def try(message, code = nil)
+    if code.nil?
+      message, code = message
+    end
+    if code != 0
+      flash[:error] = message
+      redirect '/error'
+    end
+    message
+  end
+
   def path_to(resource)
     File.join working_copy, resource
-  end
-
-  def try_p4add(resource)
-    message, code = p4add resource
-    if code != 0
-      flash[:error] = message
-      redirect '/error'
-    end
-    message
-  end
-
-  def try_p4diff(file = nil)
-    message, code = p4diff file
-    if code != 0
-      flash[:error] = message
-      redirect '/error'
-    end
-    message
-  end
-
-  def try_p4edit(resource)
-    message, code = p4edit resource
-    if code != 0
-      flash[:error] = message
-      redirect '/error'
-    end
-    message
-  end
-
-  def try_p4revert(file)
-    message, code = p4revert file
-    if code != 0
-      flash[:error] = message
-      redirect '/error'
-    end
-    message
-  end
-
-  def try_p4sync
-    message, code = p4sync
-    if code != 0
-      flash[:error] = message
-      redirect '/error'
-    end
-    message
   end
 
   def working_copy
