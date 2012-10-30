@@ -34,14 +34,6 @@
                 });
             };
 
-            $scope.commit = function () {
-                $http.post("/commit?message=" + $scope.message).success(function (response) {
-                    $scope.statusMessage = response;
-                }).failure(function (code, response) {
-                    alert("git commit failed");
-                });
-            };
-
             $scope.sync = function () {
                 $http.post("/sync").success(function (response) {
                     $scope.statusMessage = response;
@@ -110,6 +102,9 @@ Banned nicks:
     <input type="submit" value="&lt;-- Add Nick"/><br>
 </form>
 
+<button data-ng-click="sync()">Sync Working Copy</button>
+<br/>
+
 <button data-ng-click="save()">Save Changes</button>
 <br/>
 
@@ -117,14 +112,6 @@ Banned nicks:
 <br/>
 
 <button data-ng-click="revert()">Revert Changes</button>
-<br/>
-
-<button data-ng-disabled="{{!message}}" data-ng-click="commit()">Commit Changes</button>
-<label for="message">Commit Message:</label>
-<input data-ng-model="message" type="text" id="message"/>
-<br/>
-
-<button data-ng-click="sync()">Sync Working Copy</button>
 <br/><br/>
 
 <div data-ng-bind-html-unsafe="statusMessage"></div>
