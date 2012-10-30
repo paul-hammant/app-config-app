@@ -26,7 +26,7 @@
       };
 
 	  this.diffs = function() {		  
-		  $xhr("get", "/diffs", function(code, svrMessage) {
+		  $xhr("get", "/diffs/stack_configuration.json", function(code, svrMessage) {
 		      self.svrMessage = svrMessage;
 		  }, function(code, response) {
 		     alert("git diff failed");
@@ -110,5 +110,4 @@
 
 
 </html>
-
 

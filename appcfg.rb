@@ -35,7 +35,39 @@ class App < Sinatra::Application
   end
 
   before do
-     redirect '/login' unless request.path_info == '/login' or session[:authenticated]
+    redirect '/login' unless request.path_info == '/login' or session[:authenticated]
+    try_p4sync
+  end
+
+  get '/' do
+    redirect 'index.html'
+  end
+
+  get '/changes' do
+    haml :changes, locals: {
+      edited_files: parse_diffs(try_p4diff)
+    }
+  end
+
+  post '/commit' do
+    cmd = "git commit -am '" + params[:message] + "' | aha --no-header"
+    content_type 'text/html', :charset => 'utf-8'
+    %x[#{cmd}]
+  end
+
+  get '/diffs/*' do
+    resource_short = params[:splat][0]
+    resource = path_to resource_short
+    haml :diffs, locals: {
+      filename: resource_short,
+      diffs: diffs_for(resource),
+    }
+  end
+
+  get '/error' do
+    haml :error, locals: {
+        message: flash[:error]
+    }
   end
 
   get '/login' do
@@ -43,7 +75,7 @@ class App < Sinatra::Application
   end
 
   post '/login' do
-    message, code = sync params[:username], params[:password]
+    message, code = p4sync params[:username], params[:password]
     if code == 0
       session[:authenticated] = true
       session[:username] = params[:username]
@@ -56,10 +88,9 @@ class App < Sinatra::Application
     end
   end
 
-  get '/diffs' do
-    content_type 'text/html', :charset => 'utf-8'
-    content = %x[git diff --word-diff=color | aha --no-header | egrep '<span style="color:(red|green);">']
-    content.gsub /\n/, '<br/>'
+  get '/logout' do
+    session.clear
+    redirect '/'
   end
 
   post '/push' do
@@ -67,37 +98,15 @@ class App < Sinatra::Application
     %x[git push | aha --no-header]
   end
 
-  post '/commit' do
-    cmd = "git commit -am '" + params[:message] + "' | aha --no-header"
-    content_type 'text/html', :charset => 'utf-8'
-    %x[#{cmd}]
-  end
-
   post '/sync' do
-    message, code = sync
-    haml :sync, :locals => {
-        :message => message,
-        :code => code
-    }
-  end
-
-  get '/' do
-    redirect 'index.html'
-  end
-
-  get '/logout' do
-    session.clear
-    redirect '/'
-  end
-
-  get '/error' do
-    haml :error, :locals => {
-      :message => flash[:error]
+    message, code = p4sync
+    haml :sync, locals: {
+      message: message,
+      code: code
     }
   end
 
   get '/*' do
-    try_sync
     resource = path_to params[:splat][0]
     extension = extension_of resource
     if extension == 'json'
@@ -105,23 +114,22 @@ class App < Sinatra::Application
     elsif extension == 'html'
       content_type 'text/html', :charset => 'utf-8'
     end
-    file = File.open(resource, 'r')
-    content = file.read
-    file.close
-    content
+    File.open(resource, 'r') do |file|
+      file.read
+    end
   end
 
   post '/*' do
     resource = path_to params[:splat][0]
-    if extension_of(resource) != 'json'
+    if (extension_of resource) != 'json'
       raise 'Only JSON files may be edited'
     end
-    try_sync
     if File.exists? resource
-      try_edit resource
+      try_p4edit resource
     else
-      FileUtils.mkdir_p(File.dirname(resource))
-      try_add resource
+      FileUtils.mkdir_p File.dirname resource
+      FileUtils.touch resource
+      try_p4add resource
     end
     File.open(resource, 'w+') do |file|
       file.write(request.body.read)
@@ -129,70 +137,125 @@ class App < Sinatra::Application
     %x[jshon -ISF #{resource}]
   end
 
-  def add(resource, username = nil, password = nil)
-    [%x[#{p4 username, password} add #{clean resource} 2>&1], $?]
-  end
-
-  def edit(resource, username = nil, password = nil)
-    [%x[#{p4 username, password} edit #{clean resource} 2>&1], $?]
-  end
-
-  def clean(resource)
-    if resource.include? "'"
-      raise 'Resource contains invalid characters'
-    end
-    "'#{resource}'"
-  end
-
-  def p4(username = nil, password = nil)
-    username ||= session[:username]
-    password ||= session[:password]
-    if /[^\w+\-\.]/.match(username) or /[^\w+\-\.]/.match(password)
-      raise 'Illegal characters in username or password'
-    end
-    "p4 -u #{username} -P #{password} -c #{client_name username}"
-  end
-
-  def sync(username = nil, password = nil)
-    [%x[#{p4 username, password} sync 2>&1], $?]
-  end
-
-  def path_to(resource, username = nil)
-    username ||= session[:username]
-    File.join(File.dirname(__FILE__), 'wc', username, resource)
-  end
-
   def client_name(username = nil)
     username ||= session[:username]
     username + 'Client'
   end
 
+  def diffs_for(resource)
+    diffs = parse_diffs try_p4diff resource
+    if diffs.length and diffs[0]
+      diffs[0][:diffs]
+    else
+      ''
+    end
+  end
+
+  def ensure_escaped(resource)
+    if resource.include? "'" and resource.include? '"'
+      raise 'Resource contains invalid characters'
+    elsif resource.include? "'"
+      "\"#{resource}\""
+    elsif resource.include? '"'
+      "'#{resource}'"
+    elsif resource.include? ' '
+      "'#{resource}'"
+    elsif /\s/.match resource
+      raise 'Resource contains invalid characters'
+    else
+      resource
+    end
+  end
+
+  def ensure_words(word, name)
+    if /[^\w+\-\.]/.match(word)
+      raise "Illegal characters in '#{name}'"
+    end
+  end
+
   def extension_of(resource)
-    return resource.split('.').pop
+    resource.split('.').pop
   end
 
-  def try_edit(resource, username = nil, password = nil)
-    message, code = edit resource, username, password
+  def p4(username = nil, password = nil)
+    username ||= session[:username]
+    password ||= session[:password]
+    ensure_words username, 'username'
+    ensure_words password, 'password'
+    "p4 -u #{username} -P #{password} -c #{client_name username}"
+  end
+
+  def p4add(resource, username = nil, password = nil)
+    [%x[#{p4 username, password} add #{ensure_escaped resource} 2>&1], $?]
+  end
+
+  def p4diff(file = nil, username = nil, password = nil)
+    [%x[#{p4 username, password} diff #{ensure_escaped(file || '')}], $?]
+  end
+
+  def p4edit(resource, username = nil, password = nil)
+    [%x[#{p4 username, password} edit #{ensure_escaped resource} 2>&1], $?]
+  end
+
+  def p4sync(username = nil, password = nil)
+    [%x[#{p4 username, password} sync 2>&1], $?]
+  end
+
+  def parse_diffs(diffs)
+    files = []
+    diffs.lines.each do |line|
+      if matches = /^==== .+#{Regexp.escape working_copy}\/(.+) ====$/.match(line)
+        files.push({
+          filename: matches[1],
+          diffs: '',
+        })
+      else
+        files[-1][:diffs] += line
+      end
+    end
+    files
+  end
+
+  def path_to(resource, username = nil)
+    File.join working_copy(username), resource
+  end
+
+  def try_p4add(resource, username = nil, password = nil)
+    message, code = p4add resource, username, password
     if code != 0
       flash[:error] = message
       redirect '/error'
     end
   end
 
-  def try_add(resource, username = nil, password = nil)
-    message, code = add resource, username, password
+  def try_p4diff(file = nil, username = nil, password = nil)
+    message, code = p4diff file, username, password
+    if code != 0
+      flash[:error] = message
+      redirect '/error'
+    end
+    message
+  end
+
+  def try_p4edit(resource, username = nil, password = nil)
+    message, code = p4edit resource, username, password
     if code != 0
       flash[:error] = message
       redirect '/error'
     end
   end
 
-  def try_sync(username = nil, password = nil)
-    message, code = sync username, password
+  def try_p4sync(username = nil, password = nil)
+    message, code = p4sync username, password
     if code != 0
       flash[:error] = message
       redirect '/error'
     end
+  end
+
+  def working_copy(username = nil)
+    username ||= session[:username]
+    File.join File.dirname(__FILE__), 'wc', username
   end
 end
 
