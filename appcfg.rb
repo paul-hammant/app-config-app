@@ -36,7 +36,7 @@ class App < Sinatra::Application
 
   before do
     redirect '/login' unless request.path_info == '/login' or session[:authenticated]
-    try_p4sync
+    try_p4sync unless request.path_info == '/sync'
   end
 
   get '/' do
@@ -98,6 +98,14 @@ class App < Sinatra::Application
     %x[git push | aha --no-header]
   end
 
+  post '/revert/*' do
+    resource = params[:splat][0]
+    try_p4revert path_to resource
+    haml :revert, locals: {
+        filename: resource
+    }
+  end
+
   post '/sync' do
     message, code = p4sync
     haml :sync, locals: {
@@ -138,8 +146,7 @@ class App < Sinatra::Application
   end
 
   def client_name(username = nil)
-    username ||= session[:username]
-    username + 'Client'
+    "#{username || session[:username]}Client"
   end
 
   def diffs_for(resource)
@@ -177,28 +184,32 @@ class App < Sinatra::Application
     resource.split('.').pop
   end
 
-  def p4(username = nil, password = nil)
-    username ||= session[:username]
-    password ||= session[:password]
+  def p4
+    username = session[:username]
+    password = session[:password]
     ensure_words username, 'username'
     ensure_words password, 'password'
     "p4 -u #{username} -P #{password} -c #{client_name username}"
   end
 
-  def p4add(resource, username = nil, password = nil)
-    [%x[#{p4 username, password} add #{ensure_escaped resource} 2>&1], $?]
+  def p4add(resource)
+    [%x[#{p4} add #{ensure_escaped resource} 2>&1], $?]
   end
 
-  def p4diff(file = nil, username = nil, password = nil)
-    [%x[#{p4 username, password} diff #{ensure_escaped(file || '')}], $?]
+  def p4diff(file = nil)
+    [%x[#{p4} diff #{ensure_escaped(file || '')} 2>&1], $?]
   end
 
-  def p4edit(resource, username = nil, password = nil)
-    [%x[#{p4 username, password} edit #{ensure_escaped resource} 2>&1], $?]
+  def p4edit(resource)
+    [%x[#{p4} edit #{ensure_escaped resource} 2>&1], $?]
   end
 
-  def p4sync(username = nil, password = nil)
-    [%x[#{p4 username, password} sync 2>&1], $?]
+  def p4revert(resource)
+    [%x[#{p4} revert #{ensure_escaped resource} 2>&1], $?]
+  end
+
+  def p4sync
+    [%x[#{p4} sync 2>&1], $?]
   end
 
   def parse_diffs(diffs)
@@ -216,20 +227,12 @@ class App < Sinatra::Application
     files
   end
 
-  def path_to(resource, username = nil)
-    File.join working_copy(username), resource
+  def path_to(resource)
+    File.join working_copy, resource
   end
 
-  def try_p4add(resource, username = nil, password = nil)
-    message, code = p4add resource, username, password
-    if code != 0
-      flash[:error] = message
-      redirect '/error'
-    end
-  end
-
-  def try_p4diff(file = nil, username = nil, password = nil)
-    message, code = p4diff file, username, password
+  def try_p4add(resource)
+    message, code = p4add resource
     if code != 0
       flash[:error] = message
       redirect '/error'
@@ -237,25 +240,44 @@ class App < Sinatra::Application
     message
   end
 
-  def try_p4edit(resource, username = nil, password = nil)
-    message, code = p4edit resource, username, password
+  def try_p4diff(file = nil)
+    message, code = p4diff file
     if code != 0
       flash[:error] = message
       redirect '/error'
     end
+    message
   end
 
-  def try_p4sync(username = nil, password = nil)
-    message, code = p4sync username, password
+  def try_p4edit(resource)
+    message, code = p4edit resource
     if code != 0
       flash[:error] = message
       redirect '/error'
     end
+    message
   end
 
-  def working_copy(username = nil)
-    username ||= session[:username]
-    File.join File.dirname(__FILE__), 'wc', username
+  def try_p4revert(file)
+    message, code = p4revert file
+    if code != 0
+      flash[:error] = message
+      redirect '/error'
+    end
+    message
+  end
+
+  def try_p4sync
+    message, code = p4sync
+    if code != 0
+      flash[:error] = message
+      redirect '/error'
+    end
+    message
+  end
+
+  def working_copy
+    File.join File.dirname(__FILE__), 'wc', session[:username]
   end
 end
 

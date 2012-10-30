@@ -4,5 +4,7 @@
   - edited_files.each do |edited_file|
     %li
       %strong #{edited_file[:filename]}
-      %pre #{edited_file[:diffs]}
+      %pre
+        :escaped
+          #{edited_file[:diffs]}
 

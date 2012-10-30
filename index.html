@@ -13,7 +13,7 @@
     function AppCfg($resource, $xhr) {		
       var self = this;
 	  this.newNickname = "";
-	  this.svrMessage;
+	  this.statusMessage;
 	  this.message;
       this.cfg = $resource("stack_configuration.json").get({});
     
@@ -26,16 +26,16 @@
       };
 
 	  this.diffs = function() {		  
-		  $xhr("get", "/diffs/stack_configuration.json", function(code, svrMessage) {
-		      self.svrMessage = svrMessage;
+		  $xhr("get", "/diffs/stack_configuration.json", function(code, serverMessage) {
+		      self.statusMessage = serverMessage;
 		  }, function(code, response) {
-		     alert("git diff failed");
+		     alert("Diff failed");
 		  });		    	
 	  };
 	  
 	  this.commit = function() {		  
-		  $xhr("post", "/commit?message=" + self.message, function(code, svrMessage) {
-		      self.svrMessage = svrMessage;
+		  $xhr("post", "/commit?message=" + self.message, function(code, serverMessage) {
+		      self.statusMessage = serverMessage;
 		  }, function(code, response) {
 		     alert("git commit failed");
 		  });		    	
@@ -43,19 +43,23 @@
 	  
 	  this.sync = function() {
 		  $xhr("post", "/sync", function(code, svrMessage) {
-		      self.svrMessage = svrMessage;
+		      self.statusMessage = svrMessage;
 		  }, function(code, response) {
-		     alert("git sync failed");
+		     alert("Sync failed");
 		  });		    	
 	  };
-	  
-	  this.push = function() {
-		  $xhr("post", "/push", function(code, svrMessage) {
-		      self.svrMessage = svrMessage;
-		  }, function(code, response) {
-		     alert("git push failed");
-		  });		    	
-	  };
+          
+          this.revert = function() {              
+                  $xhr("post", "/revert/stack_configuration.json", function(code, serverMessage) {
+                      self.cfg.$get({}, function() {
+                          self.statusMessage = serverMessage;
+                      }, function(code, response) {
+                          alert("Revert succeeded, reload failed");
+                      });
+                  }, function(code, response) {
+                     alert("Revert failed");
+                  });
+          };
 	  
       this.newNick = function() {
         self.cfg.bannedNicks.push(self.newNickname);
@@ -95,16 +99,13 @@
   
   <hr/>
   
-  <button ng:click="diffs()">Show uncommitted diffs on server side</button><br/>
-  <button ng:click="save()">Overwrite Server Version of Config</button><br/>
+  <button ng:click="save()">Save Changes</button><br/>
+  <button ng:click="diffs()">Show Diffs</button><br/>
+  <button ng:click="revert()">Revert Changes</button><br/>
   <button ng:disabled="{{!message}}" ng:click="commit()">Commit Changes</button> Commit Message: <input name="message"></input><br/> 
-  <button ng:click="push()">Push Commits to remote repo</button><br/>
-  <button ng:click="sync()">Synchronize latest from repo</button><br/><br/>
-  
-  Last Server operation: <br/>  
-  <div ng:bind="svrMessage | html:'unsafe'">
-  </div>
+  <button ng:click="sync()">Sync Working Copy</button><br/><br/>
 
+  <div ng:bind="statusMessage | html:'unsafe'"></div>
   
 </body>
 
