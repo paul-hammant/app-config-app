@@ -111,6 +111,8 @@ class App < Sinatra::Application
       redirect '/'
     elsif message.include? "Client '#{client_name params[:username]}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
       "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
+    elsif message.include? 'command not found'
+      "p4 does not appear to be installed"
     else
       "An unknown error occurred"
     end
