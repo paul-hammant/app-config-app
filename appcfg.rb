@@ -224,9 +224,9 @@ class App < Sinatra::Application
   def parse_diffs(diffs)
     files = []
     diffs.lines.each do |line|
-      if matches = /^==== .+#{Regexp.escape working_copy}\/(.+) ====$/.match(line)
+      if /^==== .+#{Regexp.escape working_copy}\/(.+) ====$/.match(line)
         files.push({
-            filename: matches[1],
+            filename: Regexp.last_match(1),
             diffs: '',
         })
       elsif files[-1]
