@@ -255,5 +255,3 @@ class App < Sinatra::Application
     File.join File.dirname(__FILE__), 'wc', session[:username]
   end
 end
-
-
