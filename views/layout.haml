@@ -2,6 +2,7 @@
 %html{lang: 'en'}
   %head
     %title #{(yield_content :title).strip + ' | ' if content_for? :title}App-Config-App
+    %link{rel: 'stylesheet', type: 'text/css', href: '/css/layout.css'}
     #{yield_content :head}
   %body
     %header

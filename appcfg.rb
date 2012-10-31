@@ -67,15 +67,6 @@ class App < Sinatra::Application
     }
   end
 
-  get '/diffs/*' do
-    resource_short = params[:splat][0]
-    resource = path_to resource_short
-    haml :diffs, :layout => !request.xhr?, locals: {
-        filename: resource_short,
-        diffs: (diffs_for resource),
-    }
-  end
-
   get '/error' do
     haml :error, locals: {
         message: flash[:error]

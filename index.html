@@ -14,43 +14,22 @@
 
         function AppCfg($scope, $http, StackCfg) {
             $scope.newNickname = "";
-            $scope.statusMessage = "";
             $scope.message = "";
             $scope.cfg = StackCfg.get();
 
             $scope.save = function () {
                 $scope.cfg.$save(function () {
-                    alert('config saved to server');
+                    alert("config saved to server");
                 }, function () {
-                    alert('ERROR on save');
-                });
-            };
-
-            $scope.diffs = function () {
-                $http.get("/diffs/stack_configuration.json").success(function (response) {
-                    $scope.statusMessage = response;
-                }).failure(function () {
-                    alert("Diff failed");
+                    alert("ERROR on save");
                 });
             };
 
             $scope.sync = function () {
                 $http.post("/sync").success(function (response) {
-                    $scope.statusMessage = response;
+                    alert("Sync succeeded");
                 }).failure(function (response) {
                     alert("Sync failed");
-                });
-            };
-
-            $scope.revert = function () {
-                $http.post("/revert/stack_configuration.json").success(function (response) {
-                    $scope.cfg.$get({}, function () {
-                        $scope.statusMessage = response;
-                    }, function (code, response) {
-                        alert("Revert succeeded, reload failed");
-                    });
-                }).failure(function (response) {
-                    alert("Revert failed");
                 });
             };
 
@@ -107,14 +86,6 @@ Banned nicks:
 
 <button data-ng-click="save()">Save Changes</button>
 <br/>
-
-<button data-ng-click="diffs()">Show Diffs</button>
-<br/>
-
-<button data-ng-click="revert()">Revert Changes</button>
-<br/><br/>
-
-<div data-ng-bind-html-unsafe="statusMessage"></div>
 
 </body>
 </html>
