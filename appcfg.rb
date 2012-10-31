@@ -221,11 +221,15 @@ class App < Sinatra::Application
   end
 
   def p4(username = nil, password = nil)
+    p4Port = ARGV[0]
+    if p4Port.nil? 
+      p4Port = "localhost:1666"
+    end
     username ||= session[:username]
     password ||= session[:password]
     ensure_words username, 'username'
     ensure_words password, 'password'
-    "p4 -u #{username} -P #{password} -c #{client_name username}"
+    "p4 -p #{p4Port} -u #{username} -P #{password} -c #{client_name username}"
   end
 
   def p4add(resource)
