@@ -1,0 +1,22 @@
+!!! 5
+%html{lang: 'en'}
+  %head
+    %title #{(yield_content :title).strip + ' | ' if content_for? :title}App-Config-App
+    #{yield_content :head}
+  %body
+    %header
+      %h1 App-Config-App
+      %nav
+        %ul
+          - if session[:authenticated]
+            %li
+              %a{href: '/'} Home
+            %li
+              %a{href: '/changes'} Pending Changes
+            %li
+              %a{href: '/logout'} Logout
+          - else
+            %li
+              %a{href: '/login'} Login
+    %section.content
+      #{yield}

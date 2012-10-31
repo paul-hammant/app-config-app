@@ -24,6 +24,7 @@
 require 'rubygems'
 require 'haml'
 require 'sinatra'
+require 'sinatra/contrib'
 require 'json'
 require 'rack/flash'
 
@@ -43,7 +44,7 @@ class App < Sinatra::Application
   end
 
   get '/' do
-    redirect 'index.html'
+    redirect '/form/index.html'
   end
 
   get '/changes' do
@@ -62,7 +63,7 @@ class App < Sinatra::Application
   get '/diffs/*' do
     resource_short = params[:splat][0]
     resource = path_to resource_short
-    haml :diffs, locals: {
+    haml :diffs, :layout => !request.xhr?, locals: {
         filename: resource_short,
         diffs: (diffs_for resource),
     }
@@ -71,6 +72,17 @@ class App < Sinatra::Application
   get '/error' do
     haml :error, locals: {
         message: flash[:error]
+    }
+  end
+
+  get '/form/*' do
+    resource = params[:splat][0]
+    if (extension_of resource) != 'html'
+      raise 'Only HTML can be viewed from /forms'
+    end
+    haml :form, locals: {
+        form_name: resource,
+        form_url: "/#{resource}",
     }
   end
 
@@ -105,14 +117,14 @@ class App < Sinatra::Application
   post '/revert/*' do
     resource = params[:splat][0]
     try p4revert path_to resource
-    haml :revert, locals: {
+    haml :revert, :layout => !request.xhr?, locals: {
         filename: resource
     }
   end
 
   post '/sync' do
     message, code = p4sync
-    haml :sync, locals: {
+    haml :sync, :layout => !request.xhr?, locals: {
         message: message,
         code: code
     }
