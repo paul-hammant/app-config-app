@@ -35,7 +35,7 @@ class App < Sinatra::Application
   end
 
   before do
-    redirect '/login' unless request.path_info == '/login' or session[:authenticated]
+    redirect '/login' unless session[:authenticated] or %w[/login /error].include? request.path_info
     try p4sync if session[:authenticated]
   end
 
