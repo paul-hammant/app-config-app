@@ -67,6 +67,15 @@ class App < Sinatra::Application
     }
   end
 
+  get '/diffs/*' do
+    resource_short = params[:splat][0]
+    resource = path_to resource_short
+    haml :diffs, :layout => !request.xhr?, locals: {
+       filename: resource_short,
+        diffs: (diffs_for resource),
+    }
+  end
+
   get '/error' do
     haml :error, locals: {
         message: flash[:error]
@@ -74,13 +83,18 @@ class App < Sinatra::Application
   end
 
   get '/form/*' do
+    sync
     resource = params[:splat][0]
     if (extension_of resource) != 'html'
       raise 'Only HTML can be viewed from /forms'
     end
+    contents = nil
+    File.open(path_to resource) do |file|
+       contents = file.read
+    end
     haml :form, locals: {
         form_name: resource,
-        form_url: "/#{resource}",
+        form: contents,
     }
   end
 
