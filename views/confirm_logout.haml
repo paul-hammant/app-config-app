@@ -1,0 +1,14 @@
+- content_for :title do
+  Logout
+
+%h2 Logout
+
+%p
+  %strong You have pending changes in your working copy!
+
+%p
+  Are you sure you want to logout?
+  &nbsp;&nbsp;
+  %a{href: '/logout?confirm=true'} Yes
+  &nbsp;&nbsp;
+  %a{href: '/'} No

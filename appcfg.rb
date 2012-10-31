@@ -117,8 +117,12 @@ class App < Sinatra::Application
   end
 
   get '/logout' do
-    session.clear
-    redirect '/'
+    if params[:confirm].nil? and parse_diffs(try p4diff).length > 0
+      haml :confirm_logout
+    else
+      session.clear
+      redirect '/'
+    end
   end
 
   post '/push' do
