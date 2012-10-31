@@ -145,10 +145,8 @@ class App < Sinatra::Application
       try p4add resource
     end
     File.open(resource, 'w+') do |file|
-      file.write request.body.read
+      file.write JSON.pretty_generate JSON.parse request.body.read
     end
-    %x[jshon -ISF #{resource}]
-    status 204 if params[:nocontent]
   end
 
   def client_name(username = nil)

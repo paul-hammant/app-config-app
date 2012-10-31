@@ -1,15 +1,16 @@
 Installation
 ------------
 
-Jshon: http://kmkeen.com/jshon/ (Homebrew can install this)
+Requires at least Ruby 1.9.3 to run.
 
-All other dependencies are in the Gemfile.
+```
+$ bundle install
+```
 
 Running it
 ----------
 
 ```
-$ bundle install
 $ rackup
 ```
 
