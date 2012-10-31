@@ -110,8 +110,13 @@ class App < Sinatra::Application
       session[:password] = params[:password]
       redirect '/'
     elsif message.include? "Client '#{client_name params[:username]}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
+      request.logger.error message
       "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
+    elsif message.include? 'command not found'
+      request.logger.error message
+      "p4 does not appear to be installed"
     else
+      request.logger.error message
       "An unknown error occurred"
     end
   end
@@ -282,6 +287,7 @@ class App < Sinatra::Application
       message, code = message
     end
     if code != 0
+      request.logger.error message
       flash[:error] = message
       redirect '/error'
     end
