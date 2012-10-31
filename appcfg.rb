@@ -36,7 +36,6 @@ class App < Sinatra::Application
 
   before do
     redirect '/login' unless session[:authenticated] or %w[/login /error].include? request.path_info
-    try p4sync if session[:authenticated]
   end
 
   after do
@@ -120,6 +119,7 @@ class App < Sinatra::Application
   end
 
   get '/*' do
+    sync
     resource = path_to params[:splat][0]
     extension = extension_of resource
     if extension == 'json'
@@ -234,6 +234,15 @@ class App < Sinatra::Application
       end
     end
     files
+  end
+
+  def sync
+    time = Time.now.to_i
+    if session[:last_sync].nil? or session[:last_sync] < time - 30
+      try p4sync
+      session[:last_sync] = time
+      request.logger.debug 'performed sync'
+    end
   end
 
   def try(message, code = nil)
