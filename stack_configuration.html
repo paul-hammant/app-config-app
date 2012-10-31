@@ -1,9 +1,9 @@
-<div data-ng-app="appcfg">
+<div data-ng-app="stackcfg">
 
     <script type="text/javascript">
         //<![CDATA[
 
-        angular.module("appcfg", ["ngResource"]).factory("StackCfgModel", function ($resource) {
+        angular.module("stackcfg", ["ngResource"]).factory("StackCfgModel", function ($resource) {
             return $resource("/stack_configuration.json");
         });
 
@@ -22,15 +22,17 @@
             };
 
             $scope.revert = function () {
-                $http.post("/revert/stack_configuration.json").success(function (response) {
-                    $scope.cfg.$get({}, function () {
-                        $scope.statusMessage = response;
-                    }, function (code, response) {
-                        alert("Revert succeeded, reload failed");
+                if (confirm("Are you sure?\nYou will lose any changes.")) {
+                    $http.post("/revert/stack_configuration.json").success(function (response) {
+                        $scope.cfg.$get({}, function () {
+                            $scope.statusMessage = response;
+                        }, function (code, response) {
+                            alert("Revert succeeded, reload failed");
+                        });
+                    }).failure(function (response) {
+                        alert("Revert failed");
                     });
-                }).failure(function (response) {
-                    alert("Revert failed");
-                });
+                }
             };
 
             $scope.save = function () {

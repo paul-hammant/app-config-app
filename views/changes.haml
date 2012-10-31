@@ -9,10 +9,24 @@
 
 - else
 
-  %form{action: '/commit', method: 'post'}
+  :javascript
+    function hasMessage() {
+      if (!document.getElementById('message').value.match(/\w+/)) {
+        alert("Commit message is required");
+        return false;
+      }
+      return true;
+    }
+
+  %form{action: '/commit', method: 'post', onsubmit: 'return hasMessage();'}
     %label{for: 'message'} Commit Message:
     %input#message{type: 'text', name: 'message'}
     %input{type: 'submit', value: 'Commit Changes'}
+
+  :javascript
+    function confirmRevert() {
+      return confirm("Are you sure?\nYou will lose any changes.");
+    }
 
   %table
     - edited_files.each do |edited_file|
@@ -20,7 +34,7 @@
         %td
           %strong #{edited_file[:filename]}
         %td
-          %form{action: "/revert/#{edited_file[:filename]}?return_to=/changes", method: 'post'}
+          %form{action: "/revert/#{edited_file[:filename]}?return_to=/changes", method: 'post', onsubmit: 'return confirmRevert();'}
             %input{type: 'submit', value: 'Revert Changes'}
       %tr
         %td{colspan: 2}
