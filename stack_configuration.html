@@ -35,7 +35,7 @@
 
             $scope.save = function () {
                 $scope.cfg.$save(function (response) {
-                    $scope.statusMessage = response;
+                    alert("Config saved to server");
                 }, function () {
                     alert("ERROR on save");
                 });
