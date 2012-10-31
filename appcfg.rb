@@ -236,6 +236,10 @@ class App < Sinatra::Application
     files
   end
 
+  def path_to(resource)
+    File.join working_copy, resource
+  end
+
   def sync
     time = Time.now.to_i
     if session[:last_sync].nil? or session[:last_sync] < time - 30
@@ -254,10 +258,6 @@ class App < Sinatra::Application
       redirect '/error'
     end
     message
-  end
-
-  def path_to(resource)
-    File.join working_copy, resource
   end
 
   def working_copy
