@@ -44,7 +44,14 @@ class App < Sinatra::Application
   end
 
   get '/' do
-    redirect '/form/index.html'
+    sync
+    forms = []
+    Dir.glob "#{working_copy}/**/*.html" do |file|
+      forms.push file.sub /^#{Regexp.escape working_copy}/, ''
+    end
+    haml :config_forms, locals: {
+        forms: forms,
+    }
   end
 
   get '/changes' do

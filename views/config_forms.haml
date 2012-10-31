@@ -1,0 +1,9 @@
+- content_for :title do
+  Config Forms
+
+%h2 Available Config Forms
+
+%ul
+  - forms.each do |form|
+    %li
+      %a{href: "/form#{form}"} #{form}
