@@ -1,10 +1,13 @@
 Installation
 ------------
 
-Requires at least Ruby 1.9.3 to run.
+Install Ruby Gems if you have not already.
+
+The app requires at least Ruby 1.9.3 to run. 
 
 ```
 $ bundle install
+$ rvm install 1.9.3
 ```
 
 Running it
