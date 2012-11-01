@@ -15,6 +15,25 @@ $ rvm install 1.9.3 # if needed
 $ rvm 1.9.3
 ```
 
+First Time
+----------
+
+You need to setup some users in perforce. Say you're name is 'foo', from the command line:
+
+```
+$ p4 -p localhost:1666 user -f foo
+$ # (make sure you add a password line, save and exit)
+```
+
+You'll also need to create a client
+
+```
+$ p4 -p localhost:1666 -u foo -P YOUR_PASSWORD client fooClient
+$ # add the path to the repo with /wc on the end. Save and exit.
+```
+
+(both of these will happen through an admin interface eventually)
+
 Running it
 ----------
 
