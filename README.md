@@ -22,7 +22,7 @@ You need to setup some users in perforce. Say you're name is 'foo', from the com
 
 ```
 $ ruby useradd.rb
-$ host/port: localhost:1666
+$ p4port: localhost:1666
 $ username: foo
 $ email: foo@bar.com
 $ password: YOUR_PASSWORD

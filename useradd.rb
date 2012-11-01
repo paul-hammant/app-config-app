@@ -4,7 +4,7 @@ def prompt(message)
 end
 
 arg = 0
-host = (ENV['P4PORT'] || ARGV[arg += 1] || (prompt 'perforce host/port:')).strip
+p4port = (ENV['P4PORT'] || ARGV[arg += 1] || (prompt 'p4port:')).strip
 user = (ARGV[arg += 1] || (prompt 'username:')).strip
 email = (ARGV[arg += 1] || (prompt 'email:')).strip
 password = (ARGV[arg += 1] || (prompt 'password:')).strip
@@ -14,7 +14,7 @@ form += "Email:  #{email}" + '\n\n'
 form += "Password: #{password}" + '\n\n'
 form += "FullName: #{user}" + '\n\n'
 
-puts %x[echo "#{form}" | p4 -p #{host} user -i -f]
+puts %x[echo "#{form}" | p4 -p #{p4port} user -i -f]
 
 working_copy = File.join File.dirname(__FILE__), 'wc', user
 client_name = user + 'Client'
@@ -30,4 +30,4 @@ form += "LineEnd: local" + '\n\n'
 form += "View:" + '\n\n'
 form += '\t' + "//depot/... //testClient/..." + '\n\n'
 
-puts %x[echo "#{form}" | p4 -p #{host} -u #{user} -P #{password} client -i]
+puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} client -i]
