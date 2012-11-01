@@ -9,13 +9,13 @@
 
 - content_for :nav do
   %li
-    %a(data-ng-click='sync()' href='javascript: return false;') Sync
+    %a(data-ng-click="sync()" href="javascript: return false;") Sync
   %li
-    %a(data-ng-click='diffs()' href='javascript: return false;') View Diff
+    %a(data-ng-click="diffs()" href="javascript: return false;") View Diff
   %li
-    %a(data-ng-click='save()' href='javascript: return false;') Save
+    %a(data-ng-click="save()" href="javascript: return false;") Save
   %li
-    %a(data-ng-click='revert()' href='javascript: return false;') Revert
+    %a(data-ng-click="revert()" href="javascript: return false;") Revert
 
 :javascript
   angular.module("appcfg", ["ngResource"]).factory("AppCfgModel", function ($resource) {
@@ -89,19 +89,19 @@
 %div#cfg_form
 
   %label(for="lighton") Light is on:
-  %input#lighton(type="checkbox" data-ng-model="cfg.lighton")
+  %input#lighton(data-ng-model="cfg.lighton" type="checkbox")
   %br
 
   %label(for="defaultErrorReciever") Default Error Reciever (email):
-  %input#defaultErrorReciever(data-ng-model="cfg.defaultErrorReciever" data-ng-validate="email")
+  %input#defaultErrorReciever(data-ng-model="cfg.defaultErrorReciever" type="email")
   %br
 
   %label(for="loadMaxPercent") Max Load Percentage:
-  %input#loadMaxPercent(data-ng-model="cfg.loadMaxPercent")
+  %input#loadMaxPercent(data-ng-model="cfg.loadMaxPercent" type="number" min="0" max="100")
   %br
 
   %label(for="nextShutdownDate") Next Shutdown Date:
-  %input#nextShutdownDate(data-ng-model="cfg.nextShutdownDate")
+  %input#nextShutdownDate(data-ng-model="cfg.nextShutdownDate" type="text")
   %br
 
   Banned nicks:
@@ -119,4 +119,4 @@
 
 %br
 
-%div#status_message(data-ng-bind-html-unsafe='statusMessage')
+%div#status_message(data-ng-bind-html-unsafe="statusMessage")

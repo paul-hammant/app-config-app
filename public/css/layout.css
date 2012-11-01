@@ -31,3 +31,7 @@ section.content {
 #status_message {
     border-top: 1px solid black;
 }
+
+.ng-invalid {
+    color: red;
+}
