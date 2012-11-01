@@ -1,25 +1,26 @@
 !!! 5
-%html{lang: 'en'}
+%html(lang='en')
   %head
-    %title #{(yield_content :title).strip + ' | ' if content_for? :title}App-Config-App
-    %link{rel: 'stylesheet', type: 'text/css', href: '/css/layout.css'}
-    %script{type: 'text/javascript', src: 'http://code.angularjs.org/1.1.0/angular.js'}
-    %script{type: 'text/javascript', src: 'http://code.angularjs.org/1.1.0/angular-resource.js'}
+    %title #{(yield_content :title).strip} | App-Config-App
+    %link(rel='stylesheet' type='text/css' href='/css/layout.css')
+    %script(type='text/javascript' src='http://code.angularjs.org/1.1.0/angular.js')
+    %script(type='text/javascript' src='http://code.angularjs.org/1.1.0/angular-resource.js')
     #{yield_content :head}
-  %body
+  %body(data-ng-app="#{(yield_content :ng_app || '').strip}" data-ng-controller="#{(yield_content :ng_controller || '').strip}")
     %header
-      %h1 App-Config-App
+      %h1 App-Config-App | #{(yield_content :title).strip}
       %nav
         %ul
           - if session[:authenticated]
             %li
-              %a{href: '/'} Home
+              %a(href='/') Home
             %li
-              %a{href: '/changes'} Pending Changes
+              %a(href='/changes') Pending Changes
             %li
-              %a{href: '/logout'} Logout
+              %a(href='/logout') Logout
           - else
             %li
-              %a{href: '/login'} Login
+              %a(href='/login') Login
+          #{yield_content :nav}
     %section.content
       #{yield}

@@ -25,6 +25,10 @@ nav li {
     padding: 0;
 }
 
+section.content {
+    padding: 12px 0;
+}
+
 #buttons {
     border-top: 1px solid black;
     border-bottom: 1px solid black;

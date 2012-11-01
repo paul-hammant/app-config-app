@@ -1,18 +1,19 @@
-%h2 Login
+- content_for :title do
+  Login
 
-%form{:action => '/login', :method => 'post'}
+%form(action='/login' method='post')
   %table
     %tr
       %td
-        %label{:for => 'username'} Username:
+        %label(for='username') Username:
       %td
-        %input#username{:name => 'username', :type => 'text'}
+        %input#username(name='username' type='text')
     %tr
       %td
-        %label{:for => 'password'} Password:
+        %label(for='password') Password:
       %td
-        %input#password{:name => 'password', :type =>'text'}
+        %input#password(name='password' type='text')
     %tr
       %td
       %td
-        %input{:value => 'Login', :type => 'submit'}
+        %input(value='Login' type='submit')

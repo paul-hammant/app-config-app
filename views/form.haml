@@ -1,74 +1,75 @@
 - content_for :title do
   #{cfg_form_name}
 
-%h2 #{cfg_form_name}
-%div(data-ng-app='appcfg')
+- content_for :ng_app do
+  appcfg
 
-  :javascript
-    angular.module("appcfg", ["ngResource"]).factory("AppCfgModel", function ($resource) {
-      return $resource("/#{cfg_json}");
-    });
+- content_for :ng_controller do
+  AppCfg
 
-    function AppCfg($scope, $http, AppCfgModel) {
-      $scope.statusMessage = "";
-      $scope.message = "";
-      $scope.cfg = AppCfgModel.get();
+- content_for :nav do
+  %li
+    %a(data-ng-click='sync()' href='javascript: return false;') Sync Working Copy
+  %li
+    %a(data-ng-click='diffs()' href='javascript: return false;') View Diff
+  %li
+    %a(data-ng-click='save()' href='javascript: return false;') Save Changes
+  %li
+    %a(data-ng-click='revert()' href='javascript: return false;') Revert Changes
 
-      $scope.diffs = function () {
-        $http.get("/diffs/#{cfg_json}").success(function (response) {
-          $scope.statusMessage = response;
-        }).failure(function () {
-          alert("Diff failed");
-        });
-      };
+:javascript
+  angular.module("appcfg", ["ngResource"]).factory("AppCfgModel", function ($resource) {
+    return $resource("/#{cfg_json}");
+  });
 
-      $scope.revert = function () {
-        if (confirm("Are you sure?\nYou will lose any changes.")) {
-          $http.post("/revert/#{cfg_json}").success(function (response) {
-            $scope.cfg.$get({}, function () {
-              $scope.statusMessage = response;
-            }, function (code, response) {
-              alert("Revert succeeded, reload failed");
-            });
-          }).failure(function (response) {
-            alert("Revert failed");
+  function AppCfg($scope, $http, AppCfgModel) {
+    $scope.statusMessage = "";
+    $scope.message = "";
+    $scope.cfg = AppCfgModel.get();
+
+    $scope.diffs = function () {
+      $http.get("/diffs/#{cfg_json}").success(function (response) {
+        $scope.statusMessage = response;
+      }).failure(function () {
+        alert("Diff failed");
+      });
+    };
+
+    $scope.revert = function () {
+      if (confirm("Are you sure?\nYou will lose any changes.")) {
+        $http.post("/revert/#{cfg_json}").success(function (response) {
+          $scope.cfg.$get({}, function () {
+            $scope.statusMessage = response;
+          }, function (code, response) {
+            alert("Revert succeeded, reload failed");
           });
-        }
-      };
-
-      $scope.save = function () {
-        $scope.cfg.$save(function (response) {
-          alert("Config saved to server");
-        }, function () {
-          alert("ERROR on save");
-        });
-      };
-
-      $scope.sync = function () {
-        $http.post("/sync").success(function (response) {
-          $scope.statusMessage = response;
         }).failure(function (response) {
-          alert("Sync failed");
+          alert("Revert failed");
         });
-      };
+      }
+    };
 
-      #{cfg_javascript}
-    }
+    $scope.save = function () {
+      $scope.cfg.$save(function (response) {
+        alert("Config saved to server");
+      }, function () {
+        alert("ERROR on save");
+      });
+    };
 
-  %div(data-ng-controller='AppCfg')
+    $scope.sync = function () {
+      $http.post("/sync").success(function (response) {
+        $scope.statusMessage = response;
+      }).failure(function (response) {
+        alert("Sync failed");
+      });
+    };
 
-    %ul#buttons
-      %li
-        %button(data-ng-click='sync()') Sync Working Copy
-      %li
-        %button(data-ng-click='diffs()') View Diff
-      %li
-        %button(data-ng-click='save()') Save Changes
-      %li
-        %button(data-ng-click='revert()') Revert Changes
+    #{cfg_javascript}
+  }
 
-    %div#cfg_form
-      #{cfg_form}
-    %br
+%div#cfg_form
+  #{cfg_form}
+%br
 
-    %div#status_message(data-ng-bind-html-unsafe='statusMessage')
+%div#status_message(data-ng-bind-html-unsafe='statusMessage')

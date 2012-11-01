@@ -1,8 +1,6 @@
 - content_for :title do
   Pending Changes
 
-%h2 Pending Changes
-
 - if edited_files.length == 0
 
   %p No changes pending.
@@ -18,10 +16,10 @@
       return true;
     }
 
-  %form{action: '/commit', method: 'post', onsubmit: 'return hasMessage();'}
-    %label{for: 'message'} Commit Message:
-    %input#message{type: 'text', name: 'message'}
-    %input{type: 'submit', value: 'Commit Changes'}
+  %form(action='/commit' method='post' onsubmit='return hasMessage();')
+    %label(for='message') Commit Message:
+    %input#message(type='text' name='message')
+    %input(type='submit' value='Commit Changes')
 
   :javascript
     function confirmRevert() {
@@ -34,10 +32,10 @@
         %td
           %strong #{edited_file[:filename]}
         %td
-          %form{action: "/revert/#{edited_file[:filename]}?return_to=/changes", method: 'post', onsubmit: 'return confirmRevert();'}
-            %input{type: 'submit', value: 'Revert Changes'}
+          %form(action="/revert/#{edited_file[:filename]}?return_to=/changes" method='post' onsubmit='return confirmRevert();')
+            %input(type='submit' value='Revert Changes')
       %tr
-        %td{colspan: 2}
+        %td(colspan='2')
           %pre
             :escaped
               #{edited_file[:diffs]}
