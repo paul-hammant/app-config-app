@@ -10,6 +10,6 @@
  ],
  "defaultErrorReciever": "piglet@thoughtworks.com",
  "lighton": true,
- "loadMaxPercent": "88",
+ "loadMaxPercent": 88,
  "nextShutdownDate": "8/9/2012"
 }
