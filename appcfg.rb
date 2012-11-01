@@ -84,17 +84,24 @@ class App < Sinatra::Application
 
   get '/form/*' do
     sync
-    resource = params[:splat][0]
-    if (extension_of resource) != 'html'
+    cfg_form_name = params[:splat][0]
+    if (extension_of cfg_form_name) != 'html'
       raise 'Only HTML can be viewed from /forms'
     end
-    contents = nil
-    File.open(path_to resource) do |file|
-       contents = file.read
+    cfg_form = nil
+    File.open(path_to cfg_form_name) do |file|
+      cfg_form = file.read
     end
+    cfg_javascript = nil
+    File.open(path_to cfg_form_name.gsub /\.html$/, '.js') do |file|
+      cfg_javascript = file.read
+    end
+    cfg_json = cfg_form_name.gsub /\.html$/, '.json'
     haml :form, locals: {
-        form_name: resource,
-        form: contents,
+        cfg_form_name: cfg_form_name,
+        cfg_form: cfg_form,
+        cfg_javascript: cfg_javascript,
+        cfg_json: cfg_json,
     }
   end
 

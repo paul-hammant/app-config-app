@@ -1,6 +1,77 @@
 - content_for :title do
-  #{form_name}
+  #{cfg_form_name}
 
-%h2 #{form_name}
+%h2 #{cfg_form_name}
+%div(data-ng-app='appcfg')
 
-#{form}
+  :javascript
+    angular.module("appcfg", ["ngResource"]).factory("AppCfgModel", function ($resource) {
+      return $resource("/#{cfg_json}");
+    });
+
+    function AppCfg($scope, $http, AppCfgModel) {
+      $scope.statusMessage = "";
+      $scope.message = "";
+      $scope.cfg = AppCfgModel.get();
+
+      $scope.diffs = function () {
+        $http.get("/diffs/#{cfg_json}").success(function (response) {
+          $scope.statusMessage = response;
+        }).failure(function () {
+          alert("Diff failed");
+        });
+      };
+
+      $scope.revert = function () {
+        if (confirm("Are you sure?\nYou will lose any changes.")) {
+          $http.post("/revert/#{cfg_json}").success(function (response) {
+            $scope.cfg.$get({}, function () {
+              $scope.statusMessage = response;
+            }, function (code, response) {
+              alert("Revert succeeded, reload failed");
+            });
+          }).failure(function (response) {
+            alert("Revert failed");
+          });
+        }
+      };
+
+      $scope.save = function () {
+        $scope.cfg.$save(function (response) {
+          alert("Config saved to server");
+        }, function () {
+          alert("ERROR on save");
+        });
+      };
+
+      $scope.sync = function () {
+        $http.post("/sync").success(function (response) {
+          $scope.statusMessage = response;
+        }).failure(function (response) {
+          alert("Sync failed");
+        });
+      };
+
+      #{cfg_javascript}
+    }
+
+  %div(data-ng-controller='AppCfg')
+
+    %button(data-ng-click='sync()') Sync Working Copy
+    %br
+
+    %button(data-ng-click='diffs()') View Diff
+    %br
+
+    %button(data-ng-click='save()') Save Changes
+    %br
+
+    %button(data-ng-click='revert()') Revert Changes
+    %br
+    %br
+
+    %div
+      #{cfg_form}
+    %br
+
+    %div(data-ng-bind-html-unsafe='statusMessage')
