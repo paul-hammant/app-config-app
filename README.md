@@ -29,7 +29,7 @@ You'll also need to create a client
 
 ```
 $ p4 -p localhost:1666 -u foo -P YOUR_PASSWORD client fooClient
-$ # add the path to the repo with /wc on the end. Save and exit.
+$ # add the path to the repo with /wc/foo on the end. Save and exit.
 ```
 
 (both of these will happen through an admin interface eventually)
