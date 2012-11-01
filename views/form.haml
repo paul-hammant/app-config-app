@@ -9,13 +9,13 @@
 
 - content_for :nav do
   %li
-    %a(data-ng-click='sync()' href='javascript: return false;') Sync Working Copy
+    %a(data-ng-click='sync()' href='javascript: return false;') Sync
   %li
     %a(data-ng-click='diffs()' href='javascript: return false;') View Diff
   %li
-    %a(data-ng-click='save()' href='javascript: return false;') Save Changes
+    %a(data-ng-click='save()' href='javascript: return false;') Save
   %li
-    %a(data-ng-click='revert()' href='javascript: return false;') Revert Changes
+    %a(data-ng-click='revert()' href='javascript: return false;') Revert
 
 :javascript
   angular.module("appcfg", ["ngResource"]).factory("AppCfgModel", function ($resource) {
@@ -25,12 +25,14 @@
   function AppCfg($scope, $http, AppCfgModel) {
     $scope.statusMessage = "";
     $scope.message = "";
+    $scope.newNickname = "";
     $scope.cfg = AppCfgModel.get();
 
     $scope.diffs = function () {
       $http.get("/diffs/#{cfg_json}").success(function (response) {
         $scope.statusMessage = response;
       }).failure(function () {
+        $scope.statusMessage = "";
         alert("Diff failed");
       });
     };
@@ -41,9 +43,11 @@
           $scope.cfg.$get({}, function () {
             $scope.statusMessage = response;
           }, function (code, response) {
+          $scope.statusMessage = "";
             alert("Revert succeeded, reload failed");
           });
         }).failure(function (response) {
+          $scope.statusMessage = "";
           alert("Revert failed");
         });
       }
@@ -51,8 +55,10 @@
 
     $scope.save = function () {
       $scope.cfg.$save(function (response) {
+        $scope.statusMessage = "";
         alert("Config saved to server");
       }, function () {
+        $scope.statusMessage = "";
         alert("ERROR on save");
       });
     };
@@ -61,15 +67,56 @@
       $http.post("/sync").success(function (response) {
         $scope.statusMessage = response;
       }).failure(function (response) {
+        $scope.statusMessage = "";
         alert("Sync failed");
       });
     };
 
-    #{cfg_javascript}
+    $scope.newNick = function () {
+        $scope.cfg.bannedNicks.push($scope.newNickname);
+        $scope.newNickname = "";
+    };
+
+    $scope.deleteNick = function (nick) {
+        var oldBannedNicks = $scope.cfg.bannedNicks;
+        $scope.cfg.bannedNicks = [];
+        angular.forEach(oldBannedNicks, function (n) {
+            if (nick != n) $scope.cfg.bannedNicks.push(n);
+        });
+    };
   }
 
 %div#cfg_form
-  #{cfg_form}
+
+  %label(for="lighton") Light is on:
+  %input#lighton(type="checkbox" data-ng-model="cfg.lighton")
+  %br
+
+  %label(for="defaultErrorReciever") Default Error Reciever (email):
+  %input#defaultErrorReciever(data-ng-model="cfg.defaultErrorReciever" data-ng-validate="email")
+  %br
+
+  %label(for="loadMaxPercent") Max Load Percentage:
+  %input#loadMaxPercent(data-ng-model="cfg.loadMaxPercent")
+  %br
+
+  %label(for="nextShutdownDate") Next Shutdown Date:
+  %input#nextShutdownDate(data-ng-model="cfg.nextShutdownDate")
+  %br
+
+  Banned nicks:
+  %ol
+    %li(data-ng-repeat="nick in cfg.bannedNicks")
+      %span
+        {{nick}}&nbsp;&nbsp;
+        %a(data-ng-click="deleteNick(nick)") [X]
+
+  %form(data-ng-submit="newNick()")
+    %label(for="newNickname") Ban Nickname:
+    %input#newNickname(type="text" data-ng-model="newNickname" size="20")
+    %input(type="submit" value="<-- Add Nick")
+    %br
+
 %br
 
 %div#status_message(data-ng-bind-html-unsafe='statusMessage')

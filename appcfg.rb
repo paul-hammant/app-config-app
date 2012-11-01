@@ -46,8 +46,8 @@ class App < Sinatra::Application
   get '/' do
     sync
     forms = []
-    Dir.glob "#{working_copy}/**/*.html" do |file|
-      forms.push file.sub /^#{Regexp.escape working_copy}/, ''
+    Dir.glob "#{working_copy}/**/*.json" do |file|
+      forms.push file.gsub /(^#{Regexp.escape working_copy}\/|\..*$)/, ''
     end
     haml :config_forms, locals: {
         forms: forms,
@@ -85,23 +85,9 @@ class App < Sinatra::Application
   get '/form/*' do
     sync
     cfg_form_name = params[:splat][0]
-    if (extension_of cfg_form_name) != 'html'
-      raise 'Only HTML can be viewed from /forms'
-    end
-    cfg_form = nil
-    File.open(path_to cfg_form_name) do |file|
-      cfg_form = file.read
-    end
-    cfg_javascript = nil
-    File.open(path_to cfg_form_name.gsub /\.html$/, '.js') do |file|
-      cfg_javascript = file.read
-    end
-    cfg_json = cfg_form_name.gsub /\.html$/, '.json'
     haml :form, locals: {
         cfg_form_name: cfg_form_name,
-        cfg_form: cfg_form,
-        cfg_javascript: cfg_javascript,
-        cfg_json: cfg_json,
+        cfg_json: cfg_form_name + '.json',
     }
   end
 
