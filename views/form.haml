@@ -57,20 +57,17 @@
 
   %div(data-ng-controller='AppCfg')
 
-    %button(data-ng-click='sync()') Sync Working Copy
-    %br
+    %ul#buttons
+      %li
+        %button(data-ng-click='sync()') Sync Working Copy
+      %li
+        %button(data-ng-click='diffs()') View Diff
+      %li
+        %button(data-ng-click='save()') Save Changes
+      %li
+        %button(data-ng-click='revert()') Revert Changes
 
-    %button(data-ng-click='diffs()') View Diff
-    %br
-
-    %button(data-ng-click='save()') Save Changes
-    %br
-
-    %button(data-ng-click='revert()') Revert Changes
-    %br
-    %br
-
-    %div
+    %div#cfg_form
       #{cfg_form}
     %br
 
