@@ -30,6 +30,8 @@ $ User foo saved.
 $ Client fooClient saved.
 ```
 
+This command will also create a copy of stack_configuration.json in perforce the first time you run it.
+
 Running it
 ----------
 
