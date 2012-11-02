@@ -27,6 +27,7 @@
     $scope.message = "";
     $scope.newNickname = "";
     $scope.cfg = AppCfgModel.get();
+    $scope.dateRegExp = /\d\d?\/\d\d?\/\d\d\d\d/;
 
     $scope.diffs = function () {
       $http.get("/diffs/#{cfg_json}").success(function (response) {
@@ -93,15 +94,15 @@
   %br
 
   %label(for="defaultErrorReciever") Default Error Reciever (email):
-  %input#defaultErrorReciever(data-ng-model="cfg.defaultErrorReciever" type="email")
+  %input#defaultErrorReciever(data-ng-model="cfg.defaultErrorReciever" type="email" required)
   %br
 
   %label(for="loadMaxPercent") Max Load Percentage:
-  %input#loadMaxPercent(data-ng-model="cfg.loadMaxPercent" type="number" min="0" max="100")
+  %input#loadMaxPercent(data-ng-model="cfg.loadMaxPercent" type="number" min="0" max="100" required)
   %br
 
   %label(for="nextShutdownDate") Next Shutdown Date:
-  %input#nextShutdownDate(data-ng-model="cfg.nextShutdownDate" type="text")
+  %input#nextShutdownDate(data-ng-model="cfg.nextShutdownDate" type="text" data-ng-pattern="dateRegExp" required)
   %br
 
   Banned nicks:
