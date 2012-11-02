@@ -16,7 +16,7 @@ form += "FullName: #{user}" + '\n\n'
 
 puts %x[echo "#{form}" | p4 -p #{p4port} user -i -f]
 
-working_copy = File.join File.dirname(__FILE__), 'wc', user
+working_copy = File.join File.expand_path(File.dirname(__FILE__)), 'wc', user
 client_name = user + 'Client'
 
 form  = "Client: #{client_name}" + '\n\n'
@@ -31,3 +31,4 @@ form += "View:" + '\n\n'
 form += '\t' + "//depot/... //testClient/..." + '\n\n'
 
 puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} client -i]
+
