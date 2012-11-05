@@ -3,7 +3,7 @@ def prompt(message, default = nil)
   $stdout.write ' [' + default + ']' if default
   $stdout.write ': '
   input = $stdin.readline.strip
-  input if input.length > 0 else default
+  input.length > 0 ? input : default
 end
 
 p4port = prompt 'p4port', ENV['P4PORT']
