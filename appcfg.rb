@@ -112,7 +112,7 @@ class App < Sinatra::Application
   end
 
   get '/logout' do
-    if params[:confirm].nil? and (parse_diffs try p4diff).length > 0
+    if params[:confirm].nil? and (parse_diffs p4diff[0]).length > 0
       haml :confirm_logout
     else
       session.clear
