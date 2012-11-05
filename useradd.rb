@@ -1,13 +1,15 @@
-def prompt(message)
-  $stdout.write message + ' '
-  $stdin.readline
+def prompt(message, default = nil)
+  $stdout.write message
+  $stdout.write ' [' + default + ']' if default
+  $stdout.write ': '
+  input = $stdin.readline.strip
+  input if input.length > 0 else default
 end
 
-arg = 0
-p4port = (ENV['P4PORT'] || (prompt 'p4port:')).strip
-user = (prompt 'username:').strip
-email = (prompt 'email:').strip
-password = (prompt 'password:').strip
+p4port = prompt 'p4port', ENV['P4PORT']
+user = prompt 'username'
+email = prompt 'email'
+password = prompt 'password'
 
 form  = "User: #{user}" + '\n\n'
 form += "Email: #{email}" + '\n\n'
@@ -29,7 +31,7 @@ form += "Options: noallwrite noclobber nocompress unlocked nomodtime normdir" + 
 form += "SubmitOptions: submitunchanged" + '\n\n'
 form += "LineEnd: local" + '\n\n'
 form += "View:" + '\n\n'
-form += '\t' + "//depot/... //#{client_name}/..." + '\n\n'
+form += '\t' + "//depot/app-config-app/... //#{client_name}/..." + '\n\n'
 
 puts "Creating client: #{client_name}"
 puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} client -i]
@@ -44,7 +46,8 @@ puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} sync]
 
 if (Dir.entries working_copy).length == 2
   puts "stack_configuration.json not under source control, adding it..."
-  puts %x[cp stack_configuration.json #{(File.join working_copy, 'stack_configuration.json')}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'stack_configuration.json'}]
+  puts %x[mkdir -p #{(File.join working_copy, 'dev')}]
+  puts %x[cp stack_configuration.json #{(File.join working_copy, 'dev/stack_configuration.json')}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/stack_configuration.json'}]
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} submit -d "Initial import of stack_configuration.json"]
 end
