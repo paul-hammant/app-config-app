@@ -36,7 +36,7 @@ form += '\t' + "//depot/app-config-app/... //#{client_name}/..." + '\n\n'
 puts "Creating client: #{client_name}"
 puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} client -i]
 
-if (!Dir.exists? working_copy)
+if !Dir.exists? working_copy
   puts "Creating folder for working copy: #{working_copy}"
   puts %x[mkdir -p #{working_copy}]
 end

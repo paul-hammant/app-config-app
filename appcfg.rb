@@ -47,7 +47,7 @@ class App < Sinatra::Application
     sync
     forms = []
     Dir.glob "#{working_copy}/**/*.json" do |file|
-      forms.push file.gsub /(^#{Regexp.escape working_copy}\/|\..*$)/, ''
+      forms.push file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
     end
     haml :config_forms, locals: {
         forms: forms,
@@ -56,7 +56,7 @@ class App < Sinatra::Application
 
   get '/changes' do
     haml :changes, locals: {
-        edited_files: parse_diffs(try p4diff)
+        edited_files: (parse_diffs try p4diff)
     }
   end
 
@@ -83,11 +83,8 @@ class App < Sinatra::Application
   end
 
   get '/form/*' do
-    sync
-    cfg_form_name = params[:splat][0]
     haml :form, locals: {
-        cfg_form_name: cfg_form_name,
-        cfg_json: cfg_form_name + '.json',
+        cfg_form: params[:splat][0],
     }
   end
 
@@ -115,7 +112,7 @@ class App < Sinatra::Application
   end
 
   get '/logout' do
-    if params[:confirm].nil? and parse_diffs(try p4diff).length > 0
+    if params[:confirm].nil? and (parse_diffs try p4diff).length > 0
       haml :confirm_logout
     else
       session.clear
@@ -153,7 +150,7 @@ class App < Sinatra::Application
     elsif extension == 'html'
       content_type 'text/html', :charset => 'utf-8'
     end
-    File.open(resource, 'r') do |file|
+    File.open resource, 'r' do |file|
       file.read
     end
   end
@@ -170,9 +167,10 @@ class App < Sinatra::Application
       FileUtils.touch resource
       try p4add resource
     end
-    File.open(resource, 'w+') do |file|
+    File.open resource, 'w+' do |file|
       file.write JSON.pretty_generate JSON.parse request.body.read
     end
+    nil
   end
 
   def client_name(username = nil)
@@ -204,7 +202,7 @@ class App < Sinatra::Application
   end
 
   def ensure_words(word, name)
-    if /[^\w+\-\.]/.match(word)
+    if /[^\w+\-\.]/.match word
       raise "Illegal characters in '#{name}'"
     end
   end
@@ -236,7 +234,7 @@ class App < Sinatra::Application
   end
 
   def p4diff(file = nil)
-    [%x[#{p4} diff #{ensure_escaped(file || '')} 2>&1], $?]
+    [%x[#{p4} diff #{ensure_escaped file || ''} 2>&1], $?]
   end
 
   def p4edit(resource)
@@ -254,7 +252,7 @@ class App < Sinatra::Application
   def parse_diffs(diffs)
     files = []
     diffs.lines.each do |line|
-      if /^==== .+#{Regexp.escape working_copy}\/(.+) ====$/.match(line)
+      if /^==== .+#{Regexp.escape working_copy}\/(.+) ====$/.match line
         files.push({
             filename: Regexp.last_match(1),
             diffs: '',

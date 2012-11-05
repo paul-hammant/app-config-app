@@ -1,4 +1,3 @@
-root = File.dirname(__FILE__)
-require File.join(root, 'appcfg')
+require File.join File.dirname(__FILE__), 'appcfg'
 run App.new
 
