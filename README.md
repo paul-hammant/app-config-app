@@ -21,16 +21,22 @@ First Time
 You need to setup some users in perforce. Say you're name is 'foo', from the command line:
 
 ```
-$ ruby useradd.rb
+$ ruby setup_example.rb
 $ p4port: localhost:1666
 $ username: foo
 $ email: foo@bar.com
 $ password: YOUR_PASSWORD
-$ User foo saved.
-$ Client fooClient saved.
 ```
 
-This command will also create a copy of stack_configuration.json in perforce the first time you run it.
+This command will create your user in perforce and add stack_configuration.json in dev, stage, and prod branches. The following test users are also created:
+
+| Username      | Password | Write | Read       |
+|---------------|----------|-------|------------|
+| sally-runtime | bananas  | prod  | stage, dev |
+| jimmy-qa      | apples   | stage | dev        |
+| joe-developer | oranges  | dev   |            |
+
+Your user will have read/write permissions on all branches. The script useradd.rb will add and modify users, giving them read/write on all branches as well.
 
 Running it
 ----------
