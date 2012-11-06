@@ -27,269 +27,208 @@ require 'sinatra'
 require 'sinatra/contrib'
 require 'json'
 require 'rack/flash'
+require 'singleton'
+require_relative 'helpers'
 
-class App < Sinatra::Application
-  use Rack::Flash
+module AppCfg
+  class App < Sinatra::Application
+    helpers AppCfg::Helpers
+    use Rack::Flash
 
-  configure do
-    enable :sessions
-  end
-
-  before do
-    redirect '/login' unless session[:authenticated] or %w[/login /error].include? request.path_info
-  end
-
-  after do
-    redirect params[:return_to] if params[:return_to] and params[:return_to].start_with? '/'
-  end
-
-  get '/' do
-    sync
-    forms = []
-    Dir.glob "#{working_copy}/**/*.json" do |file|
-      forms.push file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
+    configure do
+      enable :sessions
     end
-    haml :config_forms, locals: {
-        forms: forms,
-    }
-  end
 
-  get '/changes' do
-    haml :changes, locals: {
-        edited_files: (parse_diffs try p4diff)
-    }
-  end
-
-  post '/commit' do
-    raise "No message entered" unless params[:message].length > 0
-    haml :commit, locals: {
-        message: (try p4commit params[:message])
-    }
-  end
-
-  get '/diffs/*' do
-    resource_short = params[:splat][0]
-    resource = path_to resource_short
-    haml :diffs, :layout => !request.xhr?, locals: {
-       filename: resource_short,
-        diffs: (diffs_for resource),
-    }
-  end
-
-  get '/error' do
-    haml :error, locals: {
-        message: flash[:error]
-    }
-  end
-
-  get '/form/*' do
-    haml :form, locals: {
-        cfg_form: params[:splat][0],
-    }
-  end
-
-  get '/login' do
-    haml :login
-  end
-
-  post '/login' do
-    message, code = p4sync params[:username], params[:password]
-    if code == 0
-      session[:authenticated] = true
-      session[:username] = params[:username]
-      session[:password] = params[:password]
-      redirect '/'
-    elsif message.include? "Client '#{client_name params[:username]}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
-      request.logger.error message
-      "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
-    elsif message.include? 'command not found'
-      request.logger.error message
-      "p4 does not appear to be installed"
-    else
-      request.logger.error message
-      "An unknown error occurred"
+    before do
+      redirect '/login' unless session[:authenticated]
     end
-  end
 
-  get '/logout' do
-    if params[:confirm].nil? and (parse_diffs p4diff[0]).length > 0
-      haml :confirm_logout
-    else
-      session.clear
-      redirect '/'
+    after do
+      redirect params[:return_to] if params[:return_to] and params[:return_to].start_with? '/'
     end
-  end
 
-  post '/push' do
-    content_type 'text/html', :charset => 'utf-8'
-    %x[git push | aha --no-header]
-  end
-
-  post '/revert/*' do
-    resource = params[:splat][0]
-    try p4revert path_to resource
-    haml :revert, :layout => !request.xhr?, locals: {
-        filename: resource
-    }
-  end
-
-  post '/sync' do
-    message, code = p4sync
-    haml :sync, :layout => !request.xhr?, locals: {
-        message: message,
-        code: code
-    }
-  end
-
-  get '/*' do
-    sync
-    resource = path_to params[:splat][0]
-    extension = extension_of resource
-    if extension == 'json'
-      content_type 'application/json'
-    elsif extension == 'html'
-      content_type 'text/html', :charset => 'utf-8'
+    get '/' do
+      sync
+      forms = []
+      Dir.glob "#{working_copy}/**/*.json" do |file|
+        forms.push file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
+      end
+      haml :config_forms, locals: {
+          forms: forms,
+      }
     end
-    File.open resource, 'r' do |file|
-      file.read
+
+    get '/changes' do
+      haml :changes, locals: {
+          edited_files: (parse_diffs try p4diff)
+      }
     end
-  end
 
-  post '/*' do
-    resource = path_to params[:splat][0]
-    if (extension_of resource) != 'json'
-      raise 'Only JSON files may be edited'
+    post '/commit' do
+      raise "No message entered" unless params[:message].length > 0
+      haml :commit, locals: {
+          message: (try p4commit params[:message])
+      }
     end
-    if File.exists? resource
-      try p4edit resource
-    else
-      FileUtils.mkdir_p File.dirname resource
-      FileUtils.touch resource
-      try p4add resource
+
+    get '/diffs/*' do
+      resource_short = params[:splat][0]
+      resource = path_to resource_short
+      haml :diffs, :layout => !request.xhr?, locals: {
+          filename: resource_short,
+          diffs: (diffs_for resource),
+      }
     end
-    File.open resource, 'w+' do |file|
-      file.write JSON.pretty_generate JSON.parse request.body.read
+
+    get '/form/*' do
+      haml :form, locals: {
+          cfg_form: params[:splat][0],
+      }
     end
-    nil
-  end
 
-  def client_name(username = nil)
-    "#{username || session[:username]}Client"
-  end
-
-  def diffs_for(resource)
-    diffs = parse_diffs try p4diff resource
-    if diffs.length and diffs[0]
-      diffs[0][:diffs]
-    else
-      ''
-    end
-  end
-
-  def ensure_escaped(resource)
-    if /[\t\f\r\n\a&\|<>:;\*\?!%\$\^`~@#\[\]\(\)\{\}\+=\\]/.match resource or
-        resource.include? '..' or (resource.include? '"' and resource.include? "'")
-      raise 'Resource contains invalid characters'
-    elsif resource.include? "'"
-      "\"#{resource}\""
-    elsif resource.include? '"'
-      "'#{resource}'"
-    elsif resource.include? ' '
-      "'#{resource}'"
-    else
-      resource
-    end
-  end
-
-  def ensure_words(word, name)
-    if /[^\w+\-\.]/.match word
-      raise "Illegal characters in '#{name}'"
-    end
-  end
-
-  def extension_of(resource)
-    resource.split('.').pop
-  end
-
-  def p4(username = nil, password = nil)
-    p4port = ARGV[0]
-    if p4port.nil?
-      p4port = 'localhost:1666'
-    end
-    username ||= session[:username]
-    password ||= session[:password]
-    ensure_words username, 'username'
-    ensure_words password, 'password'
-    "p4 -p #{p4port} -u #{username} -P #{password} -c #{client_name username}"
-  end
-
-  def p4add(resource)
-    [%x[#{p4} add #{ensure_escaped resource} 2>&1], $?]
-  end
-
-  def p4commit(message)
-    message = message.gsub /\s+/, ' '
-    message = message.gsub /"/, '\''
-    [%x[#{p4} submit -d "#{message}" 2>&1], $?]
-  end
-
-  def p4diff(file = nil)
-    [%x[#{p4} diff #{ensure_escaped file || ''} 2>&1], $?]
-  end
-
-  def p4edit(resource)
-    [%x[#{p4} edit #{ensure_escaped resource} 2>&1], $?]
-  end
-
-  def p4revert(resource)
-    [%x[#{p4} revert #{ensure_escaped resource} 2>&1], $?]
-  end
-
-  def p4sync(username = nil, password = nil)
-    [%x[#{p4 username, password} sync 2>&1], $?]
-  end
-
-  def parse_diffs(diffs)
-    files = []
-    diffs.lines.each do |line|
-      if /^==== .+#{Regexp.escape working_copy}\/(.+) ====$/.match line
-        files.push({
-            filename: Regexp.last_match(1),
-            diffs: '',
-        })
-      elsif files[-1]
-        files[-1][:diffs] += line
+    get '/logout' do
+      if params[:confirm].nil? and (parse_diffs p4diff[0]).length > 0
+        haml :confirm_logout
+      else
+        session.clear
+        redirect '/'
       end
     end
-    files
-  end
 
-  def path_to(resource)
-    File.join working_copy, resource
-  end
+    post '/push' do
+      content_type 'text/html', :charset => 'utf-8'
+      %x[git push | aha --no-header]
+    end
 
-  def sync
-    time = Time.now.to_i
-    if session[:last_sync].nil? or session[:last_sync] < time - 30
-      try p4sync
-      session[:last_sync] = time
-      request.logger.debug 'performed sync'
+    post '/revert/*' do
+      resource = params[:splat][0]
+      try p4revert path_to resource
+      haml :revert, :layout => !request.xhr?, locals: {
+          filename: resource
+      }
+    end
+
+    post '/sync' do
+      message, code = p4sync
+      haml :sync, :layout => !request.xhr?, locals: {
+          message: message,
+          code: code
+      }
+    end
+
+    get '/*' do
+      sync
+      resource_uri = params[:splat][0]
+      resource = path_to resource_uri
+      extension = extension_of resource
+      if extension == 'json'
+        content_type 'application/json'
+      elsif extension == 'html'
+        content_type 'text/html', :charset => 'utf-8'
+      end
+      File.open resource, 'r' do |file|
+        contents = file.read
+        ResourceHash.instance[resource_uri] = Digest::MD5.hexdigest contents
+        contents
+      end
+    end
+
+    post '/*' do
+      resource = path_to params[:splat][0]
+      if (extension_of resource) != 'json'
+        raise 'Only JSON files may be edited'
+      end
+      if File.exists? resource
+        try p4edit resource
+      else
+        FileUtils.mkdir_p File.dirname resource
+        FileUtils.touch resource
+        try p4add resource
+      end
+      File.open resource, 'w+' do |file|
+        file.write JSON.pretty_generate JSON.parse request.body.read
+      end
+      nil
     end
   end
 
-  def try(message, code = nil)
-    if code.nil?
-      message, code = message
+  class ErrorApp < Sinatra::Application
+    helpers AppCfg::Helpers
+    use Rack::Flash
+
+    configure do
+      enable :sessions
     end
-    if code != 0
-      request.logger.error message
-      flash[:error] = message
-      redirect '/error'
+
+    before do
+      flash[:error] ||= 'No error message'
     end
-    message
+
+    get '/' do
+      haml :error, locals: {
+          message: flash[:error]
+      }
+    end
   end
 
-  def working_copy
-    File.join File.dirname(__FILE__), 'wc', session[:username]
+  class LoginApp < Sinatra::Application
+    helpers AppCfg::Helpers
+    use Rack::Flash
+
+    configure do
+      enable :sessions
+    end
+
+    before do
+      redirect '/' if session[:authenticated]
+    end
+
+    get '/' do
+      haml :login
+    end
+
+    post '/' do
+      message, code = p4sync params[:username], params[:password]
+      if code == 0
+        session[:authenticated] = true
+        session[:username] = params[:username]
+        session[:password] = params[:password]
+        redirect '/'
+      elsif message.include? "Client '#{client_name params[:username]}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
+        request.logger.error message
+        "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
+      elsif message.include? 'command not found'
+        request.logger.error message
+        "p4 does not appear to be installed"
+      else
+        request.logger.error message
+        "An unknown error occurred"
+      end
+    end
+  end
+
+  class HashApp < Sinatra::Application
+    helpers AppCfg::Helpers
+
+    get '/*' do
+      ResourceHash.instance[params[:splat][0]] || 0.to_s
+    end
+  end
+
+  class ResourceHash
+    include Singleton
+
+    def initialize()
+      @hashes = {}
+      @mutex = Mutex.new
+    end
+
+    def [](resource)
+      @mutex.synchronize { @hashes[resource] }
+    end
+
+    def []=(resource, hash)
+      @mutex.synchronize { @hashes[resource] = hash.to_s }
+    end
   end
 end
