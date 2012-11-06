@@ -1,20 +1,41 @@
 @charset "UTF-8";
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: sans-serif;
+    font-size: 0.82em;
+    line-height: 1.6;
+    text-align: center;
+    background: linear-gradient(to bottom, #207cca 0px, #7db9e8 440px);
+}
+
+#wrapper {
+    width: 900px;
+    margin: 0 auto;
+    text-align: left;
+    background: white;
+    box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.8);
+    border-color: #207cca #2989d8 #1e5799;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 12px;
+    padding: 12px;
 }
 
 header h1 {
     font-variant: small-caps;
 }
 
-nav {
-    border-bottom: 1px solid black;
-}
-
 nav ul {
     margin: 0;
     padding: 6px 12px;
+    background: linear-gradient(to bottom, #f2f6f8 0%,#d8e1e7 50%,#b5c6d0 51%,#e0eff9 100%);
+    box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    border-top: 1px solid #e0eff9;
 }
 
 nav li {
