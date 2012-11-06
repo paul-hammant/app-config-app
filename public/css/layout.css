@@ -18,24 +18,21 @@ body {
     text-align: left;
     background: white;
     box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.8);
-    border-color: #207cca #2989d8 #1e5799;
-    border-width: 1px;
-    border-style: solid;
-    border-radius: 12px;
-    padding: 12px;
+    border-radius: 8px;
+    padding: 8px;
 }
 
 header h1 {
     font-variant: small-caps;
+    margin: 3px 12px;
 }
 
 nav ul {
     margin: 0;
-    padding: 6px 12px;
-    background: linear-gradient(to bottom, #f2f6f8 0%,#d8e1e7 50%,#b5c6d0 51%,#e0eff9 100%);
-    box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.4);
+    padding: 6px 12px 4px;
+    background: linear-gradient(to bottom, rgba(197,222,234,1) 0%,rgba(138,187,215,1) 31%,rgba(6,109,171,1) 100%);
+    box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.4);
     border-radius: 6px;
-    border-top: 1px solid #e0eff9;
 }
 
 nav li {
@@ -45,8 +42,18 @@ nav li {
     padding: 0;
 }
 
+nav li a {
+    color: #fdfeff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+nav li a:hover, nav li a:active {
+    text-decoration: underline;
+}
+
 section.content {
-    padding: 12px 0;
+    padding: 12px;
 }
 
 #status_message {

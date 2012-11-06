@@ -15,6 +15,7 @@
             - if session[:authenticated]
               %li
                 %a(href='/') Home
+              #{yield_content :nav}
               %li
                 %a(href='/changes') Pending Changes
               %li
@@ -22,6 +23,6 @@
             - else
               %li
                 %a(href='/login') Login
-            #{yield_content :nav}
+              #{yield_content :nav}
       %section.content
         #{yield}
