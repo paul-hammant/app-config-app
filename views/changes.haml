@@ -27,7 +27,6 @@
           $http.post("/commit", {message: $scope.message})
             .success(function () {alert("Committed!")})
             .failure(function () {alert("Commit failed!");});
-
         }
       }
     }

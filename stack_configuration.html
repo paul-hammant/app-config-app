@@ -1,30 +1,36 @@
 <div id="cfg_form">
+
     <label for="lighton">Light is on:</label>
     <input data-ng-model="cfg.lighton" id="lighton" type="checkbox" data-ng-change="change()"/>
-    <br />
+    <br/>
+
     <label for="defaultErrorReceiver">Default Error Receiver (email):</label>
     <input data-ng-model="cfg.defaultErrorReceiver" id="defaultErrorReceiver" required="required" type="email" data-ng-change="change()"/>
-    <br />
+    <br/>
+
     <label for="loadMaxPercent">Max Load Percentage:</label>
     <input data-ng-model="cfg.loadMaxPercent" id="loadMaxPercent" max="100" min="0" required="required" type="number" data-ng-change="change()"/>
-    <br />
+    <br/>
+
     <label for="nextShutdownDate">Next Shutdown Date:</label>
-    <input data-ng-model="cfg.nextShutdownDate" data-ng-pattern="dateRegExp" id="nextShutdownDate" required="required" type="text" data-ng-change="change()"/>
-    <br />
+    <input data-ng-model="cfg.nextShutdownDate" data-ng-pattern="/\d\d?\/\d\d?\/\d\d\d\d/" id="nextShutdownDate" required="required" type="text" data-ng-change="change()"/>
+    <br/>
+
     Banned nicks:
     <ol>
         <li data-ng-repeat="nick in cfg.bannedNicks">
       <span>
         {{nick}}&nbsp;&nbsp;
-        <a data-ng-click="deleteNick(nick)">[X]</a>
+        <a data-ng-click="removeListItem(cfg.bannedNicks, nick)">[X]</a>
       </span>
         </li>
     </ol>
-    <form data-ng-submit="newNick()">
+
+    <form data-ng-submit="addListItem(cfg.bannedNicks, newNickname)">
         <label for="newNickname">Ban Nickname:</label>
-        <input data-ng-model="newNickname" id="newNickname" size="20" type="text" />
-        <input type="submit" value="&lt;-- Add Nick" />
+        <input data-ng-model="newNickname" id="newNickname" size="20" type="text"/>
+        <input type="submit" value="&lt;-- Add Nick"/>
         <br />
     </form>
-</div>
 
+</div>

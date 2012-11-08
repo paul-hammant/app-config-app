@@ -81,12 +81,12 @@ module AppCfg
 
     get '/form/*' do
       json_resource = params[:splat][0]
-      html_resource = json_resource.sub /json$/, 'html'
-      js_resource = json_resource.sub /json$/, 'js'
+      html_resource = path_to json_resource.sub /json$/, 'html'
+      js_resource = path_to json_resource.sub /json$/, 'js'
       haml :form, locals: {
           cfg_form: json_resource,
-          form: File.open(path_to html_resource) {|file| file.read},
-          js: File.open(path_to js_resource) {|file| file.read},
+          form: File.open(html_resource) {|file| file.read},
+          js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : '',
       }
     end
 
@@ -152,7 +152,7 @@ module AppCfg
       File.open resource, 'w+' do |file|
         file.write JSON.pretty_generate JSON.parse request.body.read
       end
-      nil
+      204
     end
   end
 

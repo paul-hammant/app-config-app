@@ -62,6 +62,25 @@
       });
     };
 
+    $scope.addListItem = function (list, item) {
+      list.push(item);
+      $scope.change();
+    };
+
+    $scope.removeListItem = function (list, item) {
+      var newList = [];
+      while (list.length > 0) {
+        var n = list.pop();
+        if (n != item) {
+          newList.push(n);
+        }
+      }
+      while (newList.length > 0) {
+        list.push(newList.pop());
+      }
+      $scope.change();
+    };
+
     #{js}
   }
 
