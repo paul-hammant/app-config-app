@@ -30,7 +30,7 @@ require 'singleton'
 require_relative 'helpers'
 
 module AppCfg
-  class App < Sinatra::Application
+  class BaseApp < Sinatra::Application
     helpers AppCfg::Helpers
     use Rack::Flash
 
@@ -40,7 +40,9 @@ module AppCfg
     configure do
       enable :sessions
     end
+  end
 
+  class App < BaseApp
     before do
       redirect '/login' unless session[:authenticated]
     end
@@ -158,13 +160,7 @@ module AppCfg
     end
   end
 
-  class ErrorApp < Sinatra::Application
-    helpers AppCfg::Helpers
-    use Rack::Flash
-
-    include Rack::Utils
-    alias_method :h, :escape_html
-
+  class ErrorApp < BaseApp
     configure do
       enable :sessions
     end
@@ -180,17 +176,7 @@ module AppCfg
     end
   end
 
-  class LoginApp < Sinatra::Application
-    helpers AppCfg::Helpers
-    use Rack::Flash
-
-    include Rack::Utils
-    alias_method :h, :escape_html
-
-    configure do
-      enable :sessions
-    end
-
+  class LoginApp < BaseApp
     before do
       redirect '/' if session[:authenticated]
     end
@@ -219,12 +205,7 @@ module AppCfg
     end
   end
 
-  class HashApp < Sinatra::Application
-    helpers AppCfg::Helpers
-
-    include Rack::Utils
-    alias_method :h, :escape_html
-
+  class HashApp < BaseApp
     get '/*' do
       ResourceHash.instance[params[:splat][0]] || 0.to_s
     end
