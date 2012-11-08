@@ -17,11 +17,16 @@
   });
 
   function AppCfg($scope, $http, AppCfgModel) {
-    $scope.statusMessage = "";
-    $scope.message = "";
-    $scope.newNickname = "";
     $scope.cfg = AppCfgModel.get();
-    $scope.dateRegExp = /\d\d?\/\d\d?\/\d\d\d\d/;
+
+    $scope.change = function () {
+      $scope.cfg.$save(function () {
+        $scope.changed = false;
+      }, function () {
+        alert("Error occurred during save.");
+        $scope.changed = false;
+      });
+    }
 
     $scope.diffs = function () {
       $http.get("/diffs/#{cfg_form}").success(function (response) {
@@ -48,16 +53,6 @@
       }
     };
 
-    $scope.save = function () {
-      $scope.cfg.$save(function (response) {
-        $scope.statusMessage = "";
-        alert("Config saved to server");
-      }, function () {
-        $scope.statusMessage = "";
-        alert("ERROR on save");
-      });
-    };
-
     $scope.sync = function () {
       $http.post("/sync").success(function (response) {
         $scope.statusMessage = response;
@@ -68,17 +63,12 @@
     };
 
     #{js}
-
   }
 
 #{form}
 
-%ul
-  %li
-    %a(data-ng-click="diffs()") View Diff
-  %li
-    %a(data-ng-click="save()") Save
-  %li
-    %a(data-ng-click="revert()") Revert
+%p
+  %button(data-ng-click="diffs()") View Diff
+  %button(data-ng-click="revert()") Revert
 
 %div#status_message(data-ng-bind-html-unsafe="statusMessage")
