@@ -1,0 +1,29 @@
+<div id='cfg_form'>
+    <label for='lighton'>Light is on:</label>
+    <input data-ng-model='cfg.lighton' id='lighton' type='checkbox' />
+    <br />
+    <label for='defaultErrorReceiver'>Default Error Receiver (email):</label>
+    <input data-ng-model='cfg.defaultErrorReceiver' id='defaultErrorReceiver' required='required' type='email' />
+    <br />
+    <label for='loadMaxPercent'>Max Load Percentage:</label>
+    <input data-ng-model='cfg.loadMaxPercent' id='loadMaxPercent' max='100' min='0' required='required' type='number' />
+    <br />
+    <label for='nextShutdownDate'>Next Shutdown Date:</label>
+    <input data-ng-model='cfg.nextShutdownDate' data-ng-pattern='dateRegExp' id='nextShutdownDate' required='required' type='text' />
+    <br />
+    Banned nicks:
+    <ol>
+        <li data-ng-repeat='nick in cfg.bannedNicks'>
+      <span>
+        {{nick}}&nbsp;&nbsp;
+        <a data-ng-click='deleteNick(nick)'>[X]</a>
+      </span>
+        </li>
+    </ol>
+    <form data-ng-submit='newNick()'>
+        <label for='newNickname'>Ban Nickname:</label>
+        <input data-ng-model='newNickname' id='newNickname' size='20' type='text' />
+        <input type='submit' value='&lt;-- Add Nick' />
+        <br />
+    </form>
+</div>
