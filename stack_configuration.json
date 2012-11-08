@@ -8,7 +8,7 @@
     "www",
     "wwwwwww"
   ],
-  "defaultErrorReciever": "piglet@thoughtworks.com",
+  "defaultErrorReceiver": "piglet@thoughtworks.com",
   "lighton": true,
   "loadMaxPercent": 88,
   "nextShutdownDate": "8/9/2012"
