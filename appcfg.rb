@@ -22,7 +22,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'rubygems'
-require 'haml'
 require 'sinatra'
 require 'sinatra/contrib'
 require 'json'
@@ -34,6 +33,9 @@ module AppCfg
   class App < Sinatra::Application
     helpers AppCfg::Helpers
     use Rack::Flash
+
+    include Rack::Utils
+    alias_method :h, :escape_html
 
     configure do
       enable :sessions
@@ -53,19 +55,19 @@ module AppCfg
       Dir.glob "#{working_copy}/**/*.json" do |file|
         forms.push file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
       end
-      haml :config_forms, locals: {
+      erb :config_forms, locals: {
           forms: forms,
       }
     end
 
     get '/changes' do
-      haml :changes, locals: {
+      erb :changes, locals: {
           edited_files: (parse_diffs try p4diff)
       }
     end
 
     post '/commit' do
-      message = (JSON.parse request.body.read)['message']
+      message = request.xhr? ? (JSON.parse request.body.read)['message'] : request[:message]
       raise 'No message entered' if message.nil? or message.length == 0
       try p4commit message
     end
@@ -73,7 +75,7 @@ module AppCfg
     get '/diffs/*' do
       resource_short = params[:splat][0]
       resource = path_to resource_short
-      haml :diffs, :layout => !request.xhr?, locals: {
+      erb :diffs, :layout => !request.xhr?, locals: {
           filename: resource_short,
           diffs: (diffs_for resource),
       }
@@ -83,7 +85,7 @@ module AppCfg
       json_resource = params[:splat][0]
       html_resource = path_to json_resource.sub /json$/, 'html'
       js_resource = path_to json_resource.sub /json$/, 'js'
-      haml :form, locals: {
+      erb :form, locals: {
           cfg_form: json_resource,
           form: File.open(html_resource) {|file| file.read},
           js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : '',
@@ -92,7 +94,7 @@ module AppCfg
 
     get '/logout' do
       if params[:confirm].nil? and (parse_diffs p4diff[0]).length > 0
-        haml :confirm_logout
+        erb :confirm_logout
       else
         session.clear
         redirect '/'
@@ -107,14 +109,14 @@ module AppCfg
     post '/revert/*' do
       resource = params[:splat][0]
       try p4revert path_to resource
-      haml :revert, :layout => !request.xhr?, locals: {
+      erb :revert, :layout => !request.xhr?, locals: {
           filename: resource
       }
     end
 
     post '/sync' do
       message, code = p4sync
-      haml :sync, :layout => !request.xhr?, locals: {
+      erb :sync, :layout => !request.xhr?, locals: {
           message: message,
           code: code
       }
@@ -160,6 +162,9 @@ module AppCfg
     helpers AppCfg::Helpers
     use Rack::Flash
 
+    include Rack::Utils
+    alias_method :h, :escape_html
+
     configure do
       enable :sessions
     end
@@ -169,7 +174,7 @@ module AppCfg
     end
 
     get '/' do
-      haml :error, locals: {
+      erb :error, locals: {
           message: flash[:error]
       }
     end
@@ -178,6 +183,9 @@ module AppCfg
   class LoginApp < Sinatra::Application
     helpers AppCfg::Helpers
     use Rack::Flash
+
+    include Rack::Utils
+    alias_method :h, :escape_html
 
     configure do
       enable :sessions
@@ -188,7 +196,7 @@ module AppCfg
     end
 
     get '/' do
-      haml :login
+      erb :login
     end
 
     post '/' do
@@ -213,6 +221,9 @@ module AppCfg
 
   class HashApp < Sinatra::Application
     helpers AppCfg::Helpers
+
+    include Rack::Utils
+    alias_method :h, :escape_html
 
     get '/*' do
       ResourceHash.instance[params[:splat][0]] || 0.to_s

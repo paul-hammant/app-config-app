@@ -1,0 +1,7 @@
+<% content_for :title do "Config Forms" end %>
+
+<ul>
+<% forms.each do |form| %>
+    <li><a href="/form/<%= form %>"><%= form %></a></li>
+<% end %>
+</ul>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title><%= h (yield_content :title).strip %> | App-Config-App</title>
+    <link rel="stylesheet" type="text/css" href="/css/layout.css"/>
+    <script type="text/javascript" src="http://code.angularjs.org/1.1.0/angular.js"></script>
+    <script type="text/javascript" src="http://code.angularjs.org/1.1.0/angular-resource.js"></script>
+    <%= yield_content :head %>
+</head>
+<body>
+    <div id="wrapper">
+        <header>
+            <h1>App-Config-App | <%= h (yield_content :title).strip %></h1>
+            <nav>
+                <ul>
+                    <% if session[:authenticated] %>
+                    <li><a href="/">Home</a></li>
+                    <% yield_content :nav %>
+                    <li><a href="/changes">Pending Changes</a></li>
+                    <li><a href="/logout">Logout</a></li>
+                    <% else %>
+                    <li><a href="/login">Login</a></li>
+                    <% end %>
+                </ul>
+            </nav>
+        </header>
+        <section class="content">
+            <%= yield %>
+        </section>
+    </div>
+</body>
+</html>

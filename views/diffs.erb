@@ -1,0 +1,9 @@
+<% content_for :title do "Diffs for #{filename}" end %>
+
+<% if diffs != '' %>
+<pre>
+<%= h diffs %>
+</pre>
+<% else %>
+<p><%= h filename %> is up-to-date.</p>
+<% end %>

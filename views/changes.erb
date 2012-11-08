@@ -1,0 +1,59 @@
+<% content_for :title do "Pending Changes" end %>
+
+<% if edited_files.length == 0 %>
+<p>No changes pending.</p>
+<% else %>
+<script type="text/javascript">
+//<![CDATA[
+    function AppCfg($scope, $http) {
+        $scope.revert = function (url) {
+            if (confirm("Are you sure?\nYou will lose any changes.")) {
+                $http.post(url)
+                    .success(function () {
+                        window.location.reload();
+                    })
+                    .failure(function () {
+                        alert("Revert failed!");
+                    });
+            }
+        }
+
+        $scope.commit = function () {
+            if (!$scope.message) {
+                alert("Commit message is required!");
+            } else {
+                $http.post("/commit", {message:$scope.message})
+                    .success(function () {
+                        window.location.reload();
+                    })
+                    .failure(function () {
+                        alert("Commit failed!");
+                    });
+            }
+        }
+    }
+//]]>
+</script>
+
+<div data-ng-app="" data-ng-controller="AppCfg">
+
+    <label for="message">Commit Message:</label>
+    <input id="message" type="text" name="message" data-ng-model="message"/>
+    <input type="button" data-ng-click="commit()" value="Commit Changes"/>
+
+    <table>
+    <% edited_files.each do |edited_file| %>
+        <tr>
+            <td><strong><%= h edited_file[:filename] %></strong></td>
+            <td><input type="submit" value="Revert Changes" data-ng-click="revert('/revert/<%= h edited_file[:filename] %>')"/></td>
+        </tr>
+        <tr>
+            <td colspan="2"><pre>
+<%= h edited_file[:diffs] %>
+            </pre></td>
+        </tr>
+    <% end %>
+    </table>
+
+</div>
+<% end %>

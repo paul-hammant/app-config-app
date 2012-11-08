@@ -3,7 +3,6 @@ GEM
   specs:
     backports (2.6.4)
     eventmachine (1.0.0)
-    haml (3.1.6)
     json (1.7.5)
     rack (1.4.1)
     rack-flash3 (1.0.1)
@@ -30,7 +29,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  haml (= 3.1.6)
   json (= 1.7.5)
   rack (= 1.4.1)
   rack-flash3 (= 1.0.1)
