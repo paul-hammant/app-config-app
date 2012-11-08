@@ -54,7 +54,7 @@ module AppCfg
     get '/' do
       sync
       forms = []
-      Dir.glob "#{working_copy}/**/*.json" do |file|
+      Dir.glob "#{working_copy}/**/*.html" do |file|
         forms.push file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
       end
       erb :config_forms, locals: {
@@ -84,9 +84,9 @@ module AppCfg
     end
 
     get '/form/*' do
-      json_resource = params[:splat][0]
-      html_resource = path_to json_resource.sub /json$/, 'html'
-      js_resource = path_to json_resource.sub /json$/, 'js'
+      json_resource = params[:splat][0].sub /html$/, 'json'
+      js_resource = path_to params[:splat][0].sub /html/, 'js'
+      html_resource = path_to params[:splat][0]
       erb :form, locals: {
           cfg_form: json_resource,
           form: File.open(html_resource) {|file| file.read},
@@ -197,10 +197,10 @@ module AppCfg
         "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
       elsif message.include? 'command not found'
         request.logger.error message
-        "p4 does not appear to be installed"
+        'p4 does not appear to be installed'
       else
         request.logger.error message
-        "An unknown error occurred"
+        'An unknown error occurred'
       end
     end
   end
