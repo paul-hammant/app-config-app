@@ -1,6 +1,9 @@
 - content_for :title do
   Pending Changes
 
+- content_for :ng_controller do
+  AppCfg
+
 - if edited_files.length == 0
 
   %p No changes pending.
@@ -8,23 +11,31 @@
 - else
 
   :javascript
-    function hasMessage() {
-      if (!document.getElementById('message').value.match(/\w+/)) {
-        alert("Commit message is required");
-        return false;
+    function AppCfg($scope, $http) {
+      $scope.revert = function (url) {
+        if (confirm("Are you sure?\nYou will lose any changes.")) {
+          $http.post(url)
+            .success(function () {window.location.reload();})
+            .failure(function () {alert("Revert failed!");});
+        }
       }
-      return true;
+
+      $scope.commit = function () {
+        if (!$scope.message) {
+          alert("Commit message is required!");
+        } else {
+          $http.post("/commit", {message: $scope.message})
+            .success(function () {alert("Committed!")})
+            .failure(function () {alert("Commit failed!");});
+
+        }
+      }
     }
 
-  %form(action='/commit' method='post' onsubmit='return hasMessage();')
-    %label(for='message') Commit Message:
-    %input#message(type='text' name='message')
-    %input(type='submit' value='Commit Changes')
-
-  :javascript
-    function confirmRevert() {
-      return confirm("Are you sure?\nYou will lose any changes.");
-    }
+  %form#commit_form(action="/commit" method="post")
+    %label(for="message") Commit Message:
+    %input#message(type="text" name="message" data-ng-model="message")
+    %input(type="button" data-ng-click="commit()" value='Commit Changes')
 
   %table
     - edited_files.each do |edited_file|
@@ -32,10 +43,9 @@
         %td
           %strong #{edited_file[:filename]}
         %td
-          %form(action="/revert/#{edited_file[:filename]}?return_to=/changes" method='post' onsubmit='return confirmRevert();')
-            %input(type='submit' value='Revert Changes')
+          %input(type="submit" value="Revert Changes" data-ng-click="revert('/revert/#{edited_file[:filename]}')")
       %tr
-        %td(colspan='2')
+        %td(colspan="2")
           %pre
             :escaped
               #{edited_file[:diffs]}

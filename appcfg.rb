@@ -65,10 +65,9 @@ module AppCfg
     end
 
     post '/commit' do
-      raise "No message entered" unless params[:message].length > 0
-      haml :commit, locals: {
-          message: (try p4commit params[:message])
-      }
+      message = (JSON.parse request.body.read)['message']
+      raise 'No message entered' if message.nil? or message.length == 0
+      try p4commit message
     end
 
     get '/diffs/*' do
@@ -81,8 +80,13 @@ module AppCfg
     end
 
     get '/form/*' do
+      json_resource = params[:splat][0]
+      html_resource = json_resource.sub /json$/, 'html'
+      js_resource = json_resource.sub /json$/, 'js'
       haml :form, locals: {
-          cfg_form: params[:splat][0],
+          cfg_form: json_resource,
+          form: File.open(path_to html_resource) {|file| file.read},
+          js: File.open(path_to js_resource) {|file| file.read},
       }
     end
 

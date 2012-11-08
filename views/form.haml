@@ -10,12 +10,6 @@
 - content_for :nav do
   %li
     %a(data-ng-click="sync()") Sync
-  %li
-    %a(data-ng-click="diffs()") View Diff
-  %li
-    %a(data-ng-click="save()") Save
-  %li
-    %a(data-ng-click="revert()") Revert
 
 :javascript
   angular.module("appcfg", ["ngResource"]).factory("AppCfgModel", function ($resource) {
@@ -73,51 +67,18 @@
       });
     };
 
-    $scope.newNick = function () {
-        $scope.cfg.bannedNicks.push($scope.newNickname);
-        $scope.newNickname = "";
-    };
+    #{js}
 
-    $scope.deleteNick = function (nick) {
-        var oldBannedNicks = $scope.cfg.bannedNicks;
-        $scope.cfg.bannedNicks = [];
-        angular.forEach(oldBannedNicks, function (n) {
-            if (nick != n) $scope.cfg.bannedNicks.push(n);
-        });
-    };
   }
 
-%div#cfg_form
+#{form}
 
-  %label(for="lighton") Light is on:
-  %input#lighton(data-ng-model="cfg.lighton" type="checkbox")
-  %br
-
-  %label(for="defaultErrorReciever") Default Error Reciever (email):
-  %input#defaultErrorReciever(data-ng-model="cfg.defaultErrorReciever" type="email" required)
-  %br
-
-  %label(for="loadMaxPercent") Max Load Percentage:
-  %input#loadMaxPercent(data-ng-model="cfg.loadMaxPercent" type="number" min="0" max="100" required)
-  %br
-
-  %label(for="nextShutdownDate") Next Shutdown Date:
-  %input#nextShutdownDate(data-ng-model="cfg.nextShutdownDate" type="text" data-ng-pattern="dateRegExp" required)
-  %br
-
-  Banned nicks:
-  %ol
-    %li(data-ng-repeat="nick in cfg.bannedNicks")
-      %span
-        {{nick}}&nbsp;&nbsp;
-        %a(data-ng-click="deleteNick(nick)") [X]
-
-  %form(data-ng-submit="newNick()")
-    %label(for="newNickname") Ban Nickname:
-    %input#newNickname(type="text" data-ng-model="newNickname" size="20")
-    %input(type="submit" value="<-- Add Nick")
-    %br
-
-%br
+%ul
+  %li
+    %a(data-ng-click="diffs()") View Diff
+  %li
+    %a(data-ng-click="save()") Save
+  %li
+    %a(data-ng-click="revert()") Revert
 
 %div#status_message(data-ng-bind-html-unsafe="statusMessage")

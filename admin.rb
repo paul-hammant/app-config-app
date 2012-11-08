@@ -64,11 +64,15 @@ def useradd(p4port = nil, user = nil, email = nil, password = nil)
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} sync]
 
   if (Dir.entries working_copy).length == 2
-    puts "stack_configuration.json not under source control, adding it..."
+    puts "stack_configuration files not under source control, adding them..."
     puts %x[mkdir -p #{(File.join working_copy, 'dev')}]
     puts %x[cp stack_configuration.json #{(File.join working_copy, 'dev/stack_configuration.json')}]
+    puts %x[cp stack_configuration.js #{(File.join working_copy, 'dev/stack_configuration.js')}]
+    puts %x[cp stack_configuration.html #{(File.join working_copy, 'dev/stack_configuration.html')}]
     puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/stack_configuration.json'}]
-    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} submit -d "Initial import of stack_configuration.json"]
+    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/stack_configuration.js'}]
+    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/stack_configuration.html'}]
+    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} submit -d "Initial import of stack_configuration.json/js/html"]
   end
 
 end
