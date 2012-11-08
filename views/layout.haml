@@ -6,7 +6,7 @@
     %script(type='text/javascript' src='http://code.angularjs.org/1.1.0/angular.js')
     %script(type='text/javascript' src='http://code.angularjs.org/1.1.0/angular-resource.js')
     #{yield_content :head}
-  %body(data-ng-app="#{(yield_content :ng_app || '').strip}" data-ng-controller="#{(yield_content :ng_controller || '').strip}")
+  %body
     %div#wrapper
       %header
         %h1 App-Config-App | #{(yield_content :title).strip}

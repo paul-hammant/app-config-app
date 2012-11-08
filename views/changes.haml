@@ -31,20 +31,21 @@
       }
     }
 
-  %form#commit_form(action="/commit" method="post")
-    %label(for="message") Commit Message:
-    %input#message(type="text" name="message" data-ng-model="message")
-    %input(type="button" data-ng-click="commit()" value='Commit Changes')
+  %div(data-ng-app="" data-ng-controller="AppCfg")
+    %form#commit_form(action="/commit" method="post")
+      %label(for="message") Commit Message:
+      %input#message(type="text" name="message" data-ng-model="message")
+      %input(type="button" data-ng-click="commit()" value='Commit Changes')
 
-  %table
-    - edited_files.each do |edited_file|
-      %tr
-        %td
-          %strong #{edited_file[:filename]}
-        %td
-          %input(type="submit" value="Revert Changes" data-ng-click="revert('/revert/#{edited_file[:filename]}')")
-      %tr
-        %td(colspan="2")
-          %pre
-            :escaped
-              #{edited_file[:diffs]}
+    %table
+      - edited_files.each do |edited_file|
+        %tr
+          %td
+            %strong #{edited_file[:filename]}
+          %td
+            %input(type="submit" value="Revert Changes" data-ng-click="revert('/revert/#{edited_file[:filename]}')")
+        %tr
+          %td(colspan="2")
+            %pre
+              :escaped
+                #{edited_file[:diffs]}

@@ -1,16 +1,6 @@
 - content_for :title do
   #{cfg_form}
 
-- content_for :ng_app do
-  appcfg
-
-- content_for :ng_controller do
-  AppCfg
-
-- content_for :nav do
-  %li
-    %a(data-ng-click="sync()") Sync
-
 :javascript
   angular.module("appcfg", ["ngResource"]).factory("AppCfgModel", function ($resource) {
     return $resource("/#{cfg_form}");
@@ -53,15 +43,6 @@
       }
     };
 
-    $scope.sync = function () {
-      $http.post("/sync").success(function (response) {
-        $scope.statusMessage = response;
-      }).failure(function (response) {
-        $scope.statusMessage = "";
-        alert("Sync failed");
-      });
-    };
-
     $scope.addListItem = function (list, item) {
       list.push(item);
       $scope.change();
@@ -84,10 +65,12 @@
     #{js}
   }
 
-#{form}
+%div(data-ng-app="appcfg" data-ng-controller="AppCfg")
 
-%p
-  %button(data-ng-click="diffs()") View Diff
-  %button(data-ng-click="revert()") Revert
+  #{form}
 
-%div#status_message(data-ng-bind-html-unsafe="statusMessage")
+  %p
+    %button(data-ng-click="diffs()") View Diff
+    %button(data-ng-click="revert()") Revert
+
+  %div#status_message(data-ng-bind-html-unsafe="statusMessage")
