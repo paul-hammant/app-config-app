@@ -18,6 +18,12 @@ $ rvm 1.9.3
 First Time
 ----------
 
+First launch the Perforce Daemon:
+
+```
+$ ./perforce_daemon.sh
+```
+
 You need to setup some users in perforce. Say your name is 'foo', from the command line:
 
 ```
@@ -43,13 +49,7 @@ Your user will have read/write permissions on all branches. The script useradd.r
 Running it
 ----------
 
-First launch the Perforce Daemon:
-
-```
-$ ./perforce_daemon.sh
-```
-
-Then run the Sinatra web server:
+Run the Sinatra web server:
 
 ```
 $ rackup

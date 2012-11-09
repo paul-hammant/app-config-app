@@ -1,5 +1,6 @@
 #!/bin/sh
 
+export P4PORT=localhost:1666
 DIR=$(cd $(dirname "$0"); pwd)
 
 mkdir -p perforce_files/root
