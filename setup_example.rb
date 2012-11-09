@@ -18,8 +18,8 @@ puts %x[echo "#{protect}" | p4 -p #{p4port} protect -i]
 
 useradd p4port, user, email, password
 
-branch user, password, 'stage', 'dev'
-branch user, password, 'prod', 'stage'
+branch p4port, user, password, 'stage', 'dev'
+branch p4port, user, password, 'prod', 'stage'
 
 useradd p4port, 'sally-runtime', 'sally@test.com', 'bananas'
 useradd p4port, 'joe-developer', 'joe@test.com', 'oranges'

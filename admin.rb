@@ -1,4 +1,5 @@
-def branch(user = nil, password = nil, new_branch = nil, source_branch = nil)
+def branch(p4port = nil, user = nil, password = nil, new_branch = nil, source_branch = nil)
+  p4port ||= prompt 'p4port', ENV['P4PORT']
   user ||= prompt 'username'
   password ||= prompt 'password'
   new_branch ||= prompt 'branch'
@@ -11,9 +12,9 @@ def branch(user = nil, password = nil, new_branch = nil, source_branch = nil)
   form += '\t' + "//depot/app-config-app/#{source_branch}... //depot/app-config-app/#{new_branch}..." + '\n\n'
 
   puts "Creating branch #{new_branch}..."
-  puts %x[echo "#{form}" | p4 -u #{user} -P #{password} -c #{user}Client branch -i]
-  puts %x[p4 -u #{user} -P #{password} -c #{user}Client integrate -b #{new_branch}]
-  puts %x[p4 -u #{user} -P #{password} -c #{user}Client submit -d "Created branch #{new_branch} from #{source_branch}"]
+  puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client branch -i]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client integrate -b #{new_branch}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "Created branch #{new_branch} from #{source_branch}"]
 end
 
 def prompt(message, default = nil)
