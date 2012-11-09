@@ -18,7 +18,7 @@ $ rvm 1.9.3
 First Time
 ----------
 
-You need to setup some users in perforce. Say you're name is 'foo', from the command line:
+You need to setup some users in perforce. Say your name is 'foo', from the command line:
 
 ```
 $ ruby setup_example.rb
