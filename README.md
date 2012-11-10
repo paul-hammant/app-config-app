@@ -47,7 +47,7 @@ This command will create your user in perforce and add stack_configuration.json 
 | jimmy-qa      | apples   | stage | dev        |
 | joe-developer | oranges  | dev   |            |
 
-Your user will have read/write permissions on all branches. The script useradd.rb will add and modify users, but will give them read/write on _all_ branches. For more details on managing permissions, read [Perforce' documentation][].
+Your user will have read/write permissions on all branches. The script useradd.rb will add and modify users, but will give them read/write on _all_ branches. For more details on managing permissions, read [Perforce' documentation][].  Particularly the 'p4 protect' command.
 
 [Perforce' documentation]: http://www.perforce.com/perforce/doc.current/manuals/p4sag/04_protect.html
 
