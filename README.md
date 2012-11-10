@@ -39,7 +39,7 @@ $ email: foo@example.com
 $ password: YOUR_PASSWORD
 ```
 
-This command will create your user in perforce and add stack_configuration.json in dev, stage, and prod branches. The following test users are also created:
+This command will create your user in perforce and add aardvark_configuration.json in dev, stage, and prod branches. The following test users are also created:
 
 | Username      | Password | Write | Read       |
 |---------------|----------|-------|------------|
