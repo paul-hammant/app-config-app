@@ -53,9 +53,12 @@ module AppCfg
 
     get '/' do
       sync
-      forms = []
+      forms = {}
       Dir.glob "#{working_copy}/**/*.html" do |file|
-        forms.push file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
+        file = file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
+        env = file[/^[^\/]+/];
+        forms[env] ||= []
+        forms[env].push file.gsub /^#{env}\//, ''
       end
       erb :config_forms, locals: {
           forms: forms,

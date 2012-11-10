@@ -1,4 +1,4 @@
-<% content_for :title do cfg_form end %>
+<% content_for :title do "Config Form" end %>
 
 <script type="text/javascript">
 //<![CDATA[
@@ -69,7 +69,8 @@
 //]]>
 </script>
 
-<div data-ng-app="appcfg" data-ng-controller="AppCfg">
+<div data-ng-app="appcfg" data-ng-controller="AppCfg" id="config-form">
+    <h2><%= cfg_form %></h2>
     <%= form %>
     <p>
         <button data-ng-click="diffs()">View Diff</button>
