@@ -24,13 +24,18 @@ First launch the Perforce Daemon:
 $ ./perforce_daemon.sh
 ```
 
+Check that it is running perhaps:
+```
+ps aux | grep p4d
+```
+
 You need to setup some users in perforce. Say your name is 'foo', from the command line:
 
 ```
 $ ruby setup_example.rb
 $ p4port: localhost:1666
 $ username: foo
-$ email: foo@bar.com
+$ email: foo@example.com
 $ password: YOUR_PASSWORD
 ```
 
