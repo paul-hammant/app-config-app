@@ -64,14 +64,18 @@ def useradd(p4port = nil, user = nil, email = nil, password = nil)
   puts "Synchronizing working copy..."
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} sync]
 
-  if (Dir.entries working_copy).length == 2
-    puts "stack_configuration files not under source control, adding them..."
+  if (Dir.entries working_copy).length == 4
+    puts "**_configuration files not under source control, adding them..."
     puts %x[mkdir -p #{(File.join working_copy, 'dev')}]
-    puts %x[cp stack_configuration.json #{(File.join working_copy, 'dev/stack_configuration.json')}]
-    puts %x[cp stack_configuration.html #{(File.join working_copy, 'dev/stack_configuration.html')}]
-    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/stack_configuration.json'}]
-    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/stack_configuration.html'}]
-    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} submit -d "Initial import of stack_configuration.json/html"]
+    puts %x[cp aardvark_configuration.json #{(File.join working_copy, 'dev/aardvark_configuration.json')}]
+    puts %x[cp aardvark_configuration.html #{(File.join working_copy, 'dev/aardvark_configuration.html')}]
+    puts %x[cp banana_configuration.json #{(File.join working_copy, 'dev/banana_configuration.json')}]
+    puts %x[cp banana_configuration.html #{(File.join working_copy, 'dev/banana_configuration.html')}]
+    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/aardvark_configuration.json'}]
+    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/aardvark_configuration.html'}]
+    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/banana_configuration.json'}]
+    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} add #{File.join working_copy, 'dev/banana_configuration.html'}]
+    puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} submit -d "Initial import of **_configuration.json/html"]
   end
 
 end
