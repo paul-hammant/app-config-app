@@ -209,16 +209,16 @@ module AppCfg
   end
 
   class ServiceApp < BaseApp
-    @@opaque = Digest::MD5.hexdigest (0...50).map{('a'..'z').to_a[rand 26]}.join
+    extend ::AppCfg::Helpers
 
-    def self.new(*)
-      app = Rack::Auth::Digest::MD5.new(super) do |username|
+    use Rack::Auth::Basic, "Protected Area" do |username, password|
+      if (p4sync username, password)[1] == 0
         Thread.current[:username] = username
-        Thread.current[:password] = (YAML.load_file 'passwords.yaml')[username]
+        Thread.current[:password] = password
+        true
+      else
+        false
       end
-      app.realm = 'App-Config-App Service'
-      app.opaque = @@opaque
-      app
     end
 
     before do

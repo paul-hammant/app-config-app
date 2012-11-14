@@ -32,9 +32,3 @@ useradd p4port, 'jimmy-qa', 'jimmy@test.com', 'apples'
 useradd p4port, 'dev-app', 'admin@test.com', 's3cret1'
 useradd p4port, 'qa-app', 'admin@test.com', 's3cret2'
 useradd p4port, 'prod-app', 'admin@test.com', 's3cret3'
-
-File.open 'passwords.yaml', 'w' do |file|
-  file.write "dev-app: s3cret1\n"
-  file.write "qa-app: s3cret2\n"
-  file.write "prod-app: s3cret3\n"
-end
