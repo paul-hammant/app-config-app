@@ -209,13 +209,15 @@ module AppCfg
   end
 
   class ServiceApp < BaseApp
+    @@opaque = Digest::MD5.hexdigest (0...50).map{('a'..'z').to_a[rand 26]}.join
+
     def self.new(*)
       app = Rack::Auth::Digest::MD5.new(super) do |username|
         Thread.current[:username] = username
         Thread.current[:password] = (YAML.load_file 'passwords.yaml')[username]
       end
       app.realm = 'App-Config-App Service'
-      app.opaque = Digest::MD5.hexdigest (0...50).map{('a'..'z').to_a[rand 26]}.join
+      app.opaque = @@opaque
       app
     end
 
