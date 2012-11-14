@@ -194,15 +194,16 @@ module AppCfg
         session[:authenticated] = true
         session[:username] = params[:username]
         session[:password] = params[:password]
+        request.logger.info "Form auth succeeded for user #{params[:username]}"
         redirect '/'
       elsif message.include? "Client '#{client_name params[:username]}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
-        request.logger.error message
+        request.logger.error "Form auth failed for user #{params[:username]}: #{message}"
         "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
       elsif message.include? 'command not found'
-        request.logger.error message
+        request.logger.error "Form auth failed for user #{params[:username]}: #{message}"
         'p4 does not appear to be installed'
       else
-        request.logger.error message
+        request.logger.error "Form auth failed for user #{params[:username]}: #{message}"
         'An unknown error occurred'
       end
     end
@@ -212,11 +213,14 @@ module AppCfg
     extend ::AppCfg::Helpers
 
     use Rack::Auth::Basic, "Protected Area" do |username, password|
-      if (p4sync username, password)[1] == 0
+      message, code = p4sync username, password
+      if code == 0
         Thread.current[:username] = username
         Thread.current[:password] = password
+        request.logger.info "HTTP auth succeeded for user #{username}"
         true
       else
+        request.logger.error "HTTP auth failed for user #{username}: #{message}"
         false
       end
     end
