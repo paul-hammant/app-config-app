@@ -36,7 +36,7 @@ $ ruby setup_example.rb
 $ p4port: localhost:1666
 $ username: foo
 $ email: foo@example.com
-$ password: YOUR_PASSWORD
+$ password: ********
 ```
 
 This command will create your user in perforce and add **_configuration.json files in dev, stage, and prod branches. The following test users are also created:
@@ -46,8 +46,11 @@ This command will create your user in perforce and add **_configuration.json fil
 | sally-runtime | bananas  | prod  | stage, dev |
 | jimmy-qa      | apples   | stage | dev        |
 | joe-developer | oranges  | dev   |            |
+| prod-app      | s3cret3  | prod  |            |
+| qa-app        | s3cret2  | stage |            |
+| dev-app       | s3cret1  | dev   |            |
 
-Your user will have read/write permissions on all branches. The script useradd.rb will add and modify users, but will give them read/write on _all_ branches. For more details on managing permissions, read [Perforce' documentation][].  Particularly the 'p4 protect' command.
+Your user will have read/write permissions on all branches. The script useradd.rb will add and modify users, but will require permissions on at least one branch or the script will fail. For more details on managing permissions, read [Perforce' documentation][].  Particularly the 'p4 protect' command.
 
 [Perforce' documentation]: http://www.perforce.com/perforce/doc.current/manuals/p4sag/04_protect.html
 

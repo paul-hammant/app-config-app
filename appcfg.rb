@@ -211,7 +211,6 @@ module AppCfg
   end
 
   class ServiceApp < BaseApp
-
     def self.new(*)
       app = Rack::Auth::Digest::MD5.new(super) do |username|
         Thread.current[:username] = username
