@@ -216,12 +216,13 @@ module AppCfg
         Thread.current[:username] = username
         Thread.current[:password] = (YAML.load_file 'passwords.yaml')[username]
       end
-      app.realm = 'Protected Area'
-      app.opaque = 'secretkey'
+      app.realm = 'App-Config-App Service'
+      app.opaque = Digest::MD5.hexdigest (0...50).map{('a'..'z').to_a[rand 26]}.join
       app
     end
 
     before do
+      session[:authenticated] = false
       [:username, :password].each do |key|
         session[key] = Thread.current[key]
         Thread.current[key] = nil
