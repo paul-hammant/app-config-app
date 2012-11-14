@@ -27,6 +27,7 @@ require 'sinatra/contrib'
 require 'json'
 require 'rack/flash'
 require 'singleton'
+require 'yaml'
 require_relative 'helpers'
 
 module AppCfg
@@ -209,9 +210,41 @@ module AppCfg
     end
   end
 
-  class HashApp < BaseApp
+  class ServiceApp < BaseApp
+
+    def self.new(*)
+      app = Rack::Auth::Digest::MD5.new(super) do |username|
+        Thread.current[:username] = username
+        Thread.current[:password] = (YAML.load_file 'passwords.yaml')[username]
+      end
+      app.realm = 'Protected Area'
+      app.opaque = 'secretkey'
+      app
+    end
+
+    before do
+      [:username, :password].each do |key|
+        session[key] = Thread.current[key]
+        Thread.current[key] = nil
+      end
+    end
+
     get '/*' do
-      ResourceHash.instance[params[:splat][0]] || 0.to_s
+      sync
+      resource_uri = params[:splat][0]
+      resource = path_to resource_uri
+      extension = extension_of resource
+      File.open (resource.sub /\.(.+)$/, '.json'), 'r' do |file|
+        contents = file.read
+        if extension == 'json'
+          content_type 'application/json'
+          contents
+        elsif extension == 'md5'
+          Digest::MD5.hexdigest contents
+        else
+          raise 'Illegal resource type'
+        end
+      end
     end
   end
 

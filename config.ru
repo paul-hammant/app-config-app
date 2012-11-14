@@ -3,5 +3,5 @@ run Rack::URLMap.new({
     '/' => AppCfg::App,
     '/error' => AppCfg::ErrorApp,
     '/login' => AppCfg::LoginApp,
-    '/hash' => AppCfg::HashApp,
+    '/service' => AppCfg::ServiceApp
 })
