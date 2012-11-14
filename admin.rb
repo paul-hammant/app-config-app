@@ -64,7 +64,7 @@ def useradd(p4port = nil, user = nil, email = nil, password = nil)
   puts "Synchronizing working copy..."
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name} sync]
 
-  if (Dir.entries working_copy).length == 4
+  if (Dir.entries working_copy) == ['.', '..']
     puts "**_configuration files not under source control, adding them..."
     puts %x[mkdir -p #{(File.join working_copy, 'dev')}]
     puts %x[cp aardvark_configuration.json #{(File.join working_copy, 'dev/aardvark_configuration.json')}]

@@ -43,6 +43,7 @@ module AppCfg
   end
 
   class App < BaseApp
+
     before do
       redirect '/login' unless session[:authenticated]
     end
@@ -88,7 +89,7 @@ module AppCfg
 
     get '/form/*' do
       json_resource = params[:splat][0].sub /html$/, 'json'
-      js_resource = path_to params[:splat][0].sub /html/, 'js'
+      js_resource = path_to params[:splat][0].sub /html$/, 'js'
       html_resource = path_to params[:splat][0]
       erb :form, locals: {
           cfg_form: json_resource,
