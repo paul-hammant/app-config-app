@@ -140,9 +140,7 @@ module AppCfg
         content_type 'text/html', :charset => 'utf-8'
       end
       File.open resource, 'r' do |file|
-        contents = file.read
-        ResourceHash.instance[resource_uri] = Digest::MD5.hexdigest contents
-        contents
+        file.read
       end
     end
 
@@ -245,23 +243,6 @@ module AppCfg
           raise 'Illegal resource type'
         end
       end
-    end
-  end
-
-  class ResourceHash
-    include Singleton
-
-    def initialize()
-      @hashes = {}
-      @mutex = Mutex.new
-    end
-
-    def [](resource)
-      @mutex.synchronize { @hashes[resource] }
-    end
-
-    def []=(resource, hash)
-      @mutex.synchronize { @hashes[resource] = hash.to_s }
     end
   end
 end
