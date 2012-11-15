@@ -83,7 +83,7 @@ module AppCfg
     def parse_diffs(diffs)
       files = []
       diffs.lines.each do |line|
-        if /^==== .+#{Regexp.escape working_copy}\/(.+) ====$/.match line
+        if /#{Regexp.escape working_copy}\/(.+) ====$/.match line
           files.push({
                          filename: Regexp.last_match(1),
                          diffs: '',
