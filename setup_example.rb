@@ -2,10 +2,10 @@ require 'highline/import'
 
 require_relative 'admin'
 
-p4port = prompt 'p4port', ENV['P4PORT']
+p4port = prompt 'p4port', (ENV['P4PORT'] || 'localhost:1666')
 user = prompt 'user'
 email = prompt 'email'
-password = ask('password: ') {|q| q.echo = "*"} 
+password = ask('password: ') {|q| q.echo = "*"}
 
 protect  = %x[p4 -p #{p4port} protect -o].gsub(/^.+write user \* \* \/\/\.\.\./, '') + '\n'
 protect += '\t' + "write user #{user} * //depot/app-config-app/..." + '\n\n'
