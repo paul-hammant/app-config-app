@@ -44,9 +44,31 @@ module AppCfg
   end
 
   class App < BaseApp
+    extend Helpers
+
+    use Rack::Auth::Basic, "Protected Area" do |username, password|
+      message, code = p4sync username, password
+      if code == 0
+        Thread.current[:username] = username
+        Thread.current[:password] = password
+        true
+      elsif message.include? "Client '#{client_name params[:username]}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
+        flash[:error] = "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
+        redirect '/error'
+      elsif message.include? 'command not found'
+        flash[:error] = 'p4 does not appear to be installed'
+        redirect '/error'
+      else
+        flash[:error] = 'An unknown error occurred'
+        redirect '/error'
+      end
+    end
 
     before do
-      redirect '/login' unless session[:authenticated]
+      [:username, :password].each do |key|
+        session[key] = Thread.current[key]
+        Thread.current[key] = nil
+      end
     end
 
     after do
@@ -58,7 +80,7 @@ module AppCfg
       forms = {}
       Dir.glob "#{working_copy}/**/*.html" do |file|
         file = file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
-        env = file[/^[^\/]+/];
+        env = file[/^[^\/]+/]
         forms[env] ||= []
         forms[env].push file.gsub /^#{env}\//, ''
       end
@@ -85,17 +107,6 @@ module AppCfg
       erb :diffs, :layout => !request.xhr?, locals: {
           filename: resource_short,
           diffs: (diffs_for resource),
-      }
-    end
-
-    get '/form/*' do
-      json_resource = params[:splat][0].sub /html$/, 'json'
-      js_resource = path_to params[:splat][0].sub /html$/, 'js'
-      html_resource = path_to params[:splat][0]
-      erb :form, locals: {
-          cfg_form: json_resource,
-          form: File.open(html_resource) {|file| file.read},
-          js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : '',
       }
     end
 
@@ -136,11 +147,21 @@ module AppCfg
       extension = extension_of resource
       if extension == 'json'
         content_type 'application/json'
+        File.open(resource) {|file| file.read}
+      elsif extension == 'md5'
+        content_type 'text/plain'
+        File.open(resource.sub /md5$/, 'json') {|file| Digest::MD5.hexdigest file.read}
+      elsif extension == 'js'
+        content_type 'text/javascript'
+        File.open(resource) {|file| file.read}
       elsif extension == 'html'
-        content_type 'text/html', :charset => 'utf-8'
-      end
-      File.open resource, 'r' do |file|
-        file.read
+        json_resource = resource_uri.sub /html$/, 'json'
+        js_resource = path_to resource_uri.sub /html$/, 'js'
+        erb :form, locals: {
+            cfg_form: json_resource,
+            form: File.open(resource) {|file| file.read},
+            js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : '',
+        }
       end
     end
 
@@ -176,79 +197,6 @@ module AppCfg
       erb :error, locals: {
           message: flash[:error]
       }
-    end
-  end
-
-  class LoginApp < BaseApp
-    before do
-      redirect '/' if session[:authenticated]
-    end
-
-    get '/' do
-      erb :login
-    end
-
-    post '/' do
-      message, code = p4sync params[:username], params[:password]
-      if code == 0
-        session[:authenticated] = true
-        session[:username] = params[:username]
-        session[:password] = params[:password]
-        request.logger.info "Form auth succeeded for user #{params[:username]}"
-        redirect '/'
-      elsif message.include? "Client '#{client_name params[:username]}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
-        request.logger.error "Form auth failed for user #{params[:username]}: #{message}"
-        "The administrator needs to configure client '#{client_name params[:username]}' for user '#{params[:username]}'"
-      elsif message.include? 'command not found'
-        request.logger.error "Form auth failed for user #{params[:username]}: #{message}"
-        'p4 does not appear to be installed'
-      else
-        request.logger.error "Form auth failed for user #{params[:username]}: #{message}"
-        'An unknown error occurred'
-      end
-    end
-  end
-
-  class ServiceApp < BaseApp
-    extend ::AppCfg::Helpers
-
-    use Rack::Auth::Basic, "Protected Area" do |username, password|
-      message, code = p4sync username, password
-      if code == 0
-        Thread.current[:username] = username
-        Thread.current[:password] = password
-        request.logger.info "HTTP auth succeeded for user #{username}"
-        true
-      else
-        request.logger.error "HTTP auth failed for user #{username}: #{message}"
-        false
-      end
-    end
-
-    before do
-      session[:authenticated] = false
-      [:username, :password].each do |key|
-        session[key] = Thread.current[key]
-        Thread.current[key] = nil
-      end
-    end
-
-    get '/*' do
-      sync
-      resource_uri = params[:splat][0]
-      resource = path_to resource_uri
-      extension = extension_of resource
-      File.open (resource.sub /\.(.+)$/, '.json'), 'r' do |file|
-        contents = file.read
-        if extension == 'json'
-          content_type 'application/json'
-          contents
-        elsif extension == 'md5'
-          Digest::MD5.hexdigest contents
-        else
-          raise 'Illegal resource type'
-        end
-      end
     end
   end
 end
