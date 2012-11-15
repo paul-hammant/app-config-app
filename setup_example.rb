@@ -10,13 +10,13 @@ password = ask('password: ') {|q| q.echo = "*"}
 protect  = %x[p4 -p #{p4port} protect -o].gsub(/^.+write user \* \* \/\/\.\.\./, '') + '\n'
 protect += '\t' + "write user #{user} * //depot/app-config-app/..." + '\n\n'
 protect += '\twrite user sally-runtime * //depot/app-config-app/prod/...\n\n'
-protect += '\tread user sally-runtime * //depot/app-config-app/stage/...\n\n'
+protect += '\tread user sally-runtime * //depot/app-config-app/staging/...\n\n'
 protect += '\tread user sally-runtime * //depot/app-config-app/dev/...\n\n'
 protect += '\twrite user joe-developer * //depot/app-config-app/dev/...\n\n'
-protect += '\twrite user jimmy-qa * //depot/app-config-app/stage/...\n\n'
+protect += '\twrite user jimmy-qa * //depot/app-config-app/staging/...\n\n'
 protect += '\tread user jimmy-qa * //depot/app-config-app/dev/...\n\n'
 protect += '\tread user dev-app * //depot/app-config-app/dev/...\n\n'
-protect += '\tread user qa-app * //depot/app-config-app/stage/...\n\n'
+protect += '\tread user qa-app * //depot/app-config-app/staging/...\n\n'
 protect += '\tread user prod-app * //depot/app-config-app/prod/...\n\n'
 
 puts %x[echo "#{protect}" | p4 -p #{p4port} protect -i]
@@ -37,8 +37,8 @@ if (Dir.entries working_copy user).sort! == ['.', '..']
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} submit -d "Initial import of **_configuration.json/html"]
 end
 
-branch p4port, user, password, 'stage', 'dev'
-branch p4port, user, password, 'prod', 'stage'
+branch p4port, user, password, 'staging', 'dev'
+branch p4port, user, password, 'prod', 'staging'
 
 add_user p4port, 'sally-runtime', 'sally@test.com', 'bananas'
 add_user p4port, 'joe-developer', 'joe@test.com', 'oranges'

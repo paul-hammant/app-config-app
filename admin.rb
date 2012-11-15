@@ -12,11 +12,11 @@ def add_user(p4port = nil, user = nil, email = nil, password = nil)
   puts "Creating user: #{user}"
   puts %x[echo "#{form}" | p4 -p #{p4port} user -i -f]
 
-  form  = "Client: #{client_name username}" + '\n\n'
+  form  = "Client: #{client_name user}" + '\n\n'
   form += "Owner: #{user}" + '\n\n'
   form += "Description:" + '\n'
   form += '\t' + "Created by #{user}" + '\n\n'
-  form += "Root: #{working_copy username}" + '\n\n'
+  form += "Root: #{working_copy user}" + '\n\n'
   form += "Options: noallwrite noclobber nocompress unlocked nomodtime normdir" + '\n\n'
   form += "SubmitOptions: submitunchanged" + '\n\n'
   form += "LineEnd: local" + '\n\n'
@@ -54,8 +54,8 @@ def branch(p4port = nil, user = nil, password = nil, new_branch = nil, source_br
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "Created branch #{new_branch} from #{source_branch}"]
 end
 
-def client_name(username)
-  "#{username}Client"
+def client_name(user)
+  "#{user}Client"
 end
 
 def prompt(message, default = nil)
@@ -66,6 +66,6 @@ def prompt(message, default = nil)
   input.length > 0 ? input : default
 end
 
-def working_copy(username)
-  File.join (File.expand_path File.dirname __FILE__), 'wc', username
+def working_copy(user)
+  File.join (File.expand_path File.dirname __FILE__), 'wc', user
 end

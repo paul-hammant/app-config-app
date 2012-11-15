@@ -43,17 +43,17 @@ $ password: ********
 ```
 
 This command will create your user in perforce and add **_configuration.json
-files in dev, stage, and prod branches. The following test users are also
+files in dev, staging, and prod branches. The following test users are also
 created:
 
-| Username      | Password | Write | Read       |
-|---------------|----------|-------|------------|
-| sally-runtime | bananas  | prod  | stage, dev |
-| jimmy-qa      | apples   | stage | dev        |
-| joe-developer | oranges  | dev   |            |
-| prod-app      | s3cret3  |       | prod       |
-| qa-app        | s3cret2  |       | stage      |
-| dev-app       | s3cret1  |       | dev        |
+| Username      | Password | Write   | Read         |
+|---------------|----------|---------|--------------|
+| sally-runtime | bananas  | prod    | staging, dev |
+| jimmy-qa      | apples   | staging | dev          |
+| joe-developer | oranges  | dev     |              |
+| prod-app      | s3cret3  |         | prod         |
+| qa-app        | s3cret2  |         | staging      |
+| dev-app       | s3cret1  |         | dev          |
 
 Your user will have read/write permissions on all branches. The script
 useradd.rb will add and modify users, but will require permissions on at least
