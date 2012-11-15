@@ -80,7 +80,7 @@ module AppCfg
       forms = {}
       Dir.glob "#{working_copy}/**/*.html" do |file|
         file = file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
-        env = file[/^[^\/]+/]
+        env = file[/^[^\/]+/] || '.'
         forms[env] ||= []
         forms[env].push file.gsub /^#{env}\//, ''
       end
