@@ -29,7 +29,8 @@ module AppCfg
         Thread.current[:username] = username
         Thread.current[:password] = password
         true
-      elsif message.include? "Client '#{client_name username}' unknown" or message.include? "Perforce password (P4PASSWD) invalid or unset."
+      elsif message.include? "Client '#{client_name username}' unknown" or
+          message.include? "Perforce password (P4PASSWD) invalid or unset."
         flash[:error] = "The administrator needs to configure client '#{client_name username}' for user '#{username}'"
         redirect '/error'
       elsif message.include? 'command not found'
