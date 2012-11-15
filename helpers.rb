@@ -43,7 +43,7 @@ module AppCfg
     end
 
     def p4(username = nil, password = nil)
-      p4port = ARGV[0]
+      p4port = ENV['P4PORT']
       if p4port.nil?
         p4port = 'localhost:1666'
       end

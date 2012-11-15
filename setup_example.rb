@@ -21,14 +21,28 @@ protect += '\tread user prod-app * //depot/app-config-app/prod/...\n\n'
 
 puts %x[echo "#{protect}" | p4 -p #{p4port} protect -i]
 
-useradd p4port, user, email, password
+add_user p4port, user, email, password
+
+if (Dir.entries working_copy user).sort! == ['.', '..']
+  puts "**_configuration files not under source control, adding them..."
+  puts %x[mkdir -p #{(File.join (working_copy user), 'dev')}]
+  puts %x[cp aardvark_configuration.json #{(File.join (working_copy user), 'dev/aardvark_configuration.json')}]
+  puts %x[cp aardvark_configuration.html #{(File.join (working_copy user), 'dev/aardvark_configuration.html')}]
+  puts %x[cp banana_configuration.json #{(File.join (working_copy user), 'dev/banana_configuration.json')}]
+  puts %x[cp banana_configuration.html #{(File.join (working_copy user), 'dev/banana_configuration.html')}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/aardvark_configuration.json'}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/aardvark_configuration.html'}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/banana_configuration.json'}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/banana_configuration.html'}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} submit -d "Initial import of **_configuration.json/html"]
+end
 
 branch p4port, user, password, 'stage', 'dev'
 branch p4port, user, password, 'prod', 'stage'
 
-useradd p4port, 'sally-runtime', 'sally@test.com', 'bananas'
-useradd p4port, 'joe-developer', 'joe@test.com', 'oranges'
-useradd p4port, 'jimmy-qa', 'jimmy@test.com', 'apples'
-useradd p4port, 'dev-app', 'admin@test.com', 's3cret1'
-useradd p4port, 'qa-app', 'admin@test.com', 's3cret2'
-useradd p4port, 'prod-app', 'admin@test.com', 's3cret3'
+add_user p4port, 'sally-runtime', 'sally@test.com', 'bananas'
+add_user p4port, 'joe-developer', 'joe@test.com', 'oranges'
+add_user p4port, 'jimmy-qa', 'jimmy@test.com', 'apples'
+add_user p4port, 'dev-app', 'admin@test.com', 's3cret1'
+add_user p4port, 'qa-app', 'admin@test.com', 's3cret2'
+add_user p4port, 'prod-app', 'admin@test.com', 's3cret3'
