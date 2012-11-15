@@ -1,5 +1,6 @@
 .idea
 .DS_Store
+*.iml
+*.lock
 wc
 perforce_files
-passwords.yaml
