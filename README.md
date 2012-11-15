@@ -66,9 +66,9 @@ read [Perforce' documentation][].  Particularly the 'p4 protect' command.
 $ rackup
 ```
 
-Then crank up your browser, and go to [http://localhost:9292]. Fiddle around
-with the different users to see how App-Config-App handles their respective
-permissions in Perforce.
+Then crank up your browser, and go to [http://localhost:9292](http://localhost:9292).
+Fiddle around with the different users to see how App-Config-App handles their
+respective permissions in Perforce.
 
 # Productionalizing
 
