@@ -51,9 +51,9 @@ created:
 | sally-runtime | bananas  | prod  | stage, dev |
 | jimmy-qa      | apples   | stage | dev        |
 | joe-developer | oranges  | dev   |            |
-| prod-app      | s3cret3  | prod  |            |
-| qa-app        | s3cret2  | stage |            |
-| dev-app       | s3cret1  | dev   |            |
+| prod-app      | s3cret3  |       | prod       |
+| qa-app        | s3cret2  |       | stage      |
+| dev-app       | s3cret1  |       | dev        |
 
 Your user will have read/write permissions on all branches. The script
 useradd.rb will add and modify users, but will require permissions on at least
