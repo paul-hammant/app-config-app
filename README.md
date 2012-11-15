@@ -72,9 +72,9 @@ respective permissions in Perforce.
 
 # Productionalizing
 
-*All users created by `setup_example.rb` are intended only as examples.* As an
-end-user of App-Config-App, all your application users should be configured
-with real data and real permissions.
+**All users created by `setup_example.rb` are intended only as examples.** In
+the real world, all application users should be setup with real logins and
+real permissions.
 
 The Perforce server that App-Config-App connects to is accessed by default
 using localhost:1666. To connect to a different server, set it using the
