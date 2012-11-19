@@ -26,14 +26,8 @@ add_user p4port, user, email, password
 if (Dir.entries working_copy user).sort! == ['.', '..']
   puts "**_configuration files not under source control, adding them..."
   puts %x[mkdir -p #{(File.join (working_copy user), 'dev')}]
-  puts %x[cp aardvark_configuration.json #{(File.join (working_copy user), 'dev/aardvark_configuration.json')}]
-  puts %x[cp aardvark_configuration.html #{(File.join (working_copy user), 'dev/aardvark_configuration.html')}]
-  puts %x[cp banana_configuration.json #{(File.join (working_copy user), 'dev/banana_configuration.json')}]
-  puts %x[cp banana_configuration.html #{(File.join (working_copy user), 'dev/banana_configuration.html')}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/aardvark_configuration.json'}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/aardvark_configuration.html'}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/banana_configuration.json'}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/banana_configuration.html'}]
+  puts %x[cp example_config/* #{(File.join (working_copy user), 'dev/')}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/*'}]
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} submit -d "Initial import of **_configuration.json/html"]
 end
 
