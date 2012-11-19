@@ -1,7 +1,7 @@
 <div id="cfg_form">
 
     <label for="instrument">Instrument:</label>
-    <input data-ng-model="cfg.instrument" id="instrument" required="required" type="text" data-ng-change="change()"/>
+	<select ng-model="cfg.instrument" ng-options="item.name as item.name for item in instruments" data-ng-change="change()"></select>
     <br/>
 
 </div>

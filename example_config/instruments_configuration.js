@@ -1,0 +1,1 @@
+$scope.instruments = [ {name: 'Piano'}, {name: 'Trumpet'}];
