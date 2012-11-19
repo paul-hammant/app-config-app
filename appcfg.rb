@@ -47,6 +47,7 @@ module AppCfg
         session[key] = Thread.current[key]
         Thread.current[key] = nil
       end
+      session[:authenticated] = true
     end
 
     after do
