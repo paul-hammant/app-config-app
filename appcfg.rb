@@ -24,21 +24,13 @@ module AppCfg
     extend Helpers
 
     use Rack::Auth::Basic, "Protected Area" do |username, password|
-      message, code = p4sync username, password
+      _, code = p4sync username, password
       if code == 0
         Thread.current[:username] = username
         Thread.current[:password] = password
         true
-      elsif message.include? "Client '#{client_name username}' unknown" or
-          message.include? "Perforce password (P4PASSWD) invalid or unset."
-        flash[:error] = "The administrator needs to configure client '#{client_name username}' for user '#{username}'"
-        redirect '/error'
-      elsif message.include? 'command not found'
-        flash[:error] = 'p4 does not appear to be installed'
-        redirect '/error'
       else
-        flash[:error] = 'An unknown error occurred'
-        redirect '/error'
+        false
       end
     end
 
