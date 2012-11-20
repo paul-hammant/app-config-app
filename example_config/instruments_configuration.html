@@ -1,7 +1,8 @@
 <div id="cfg_form">
 
     <label for="instrument">Instrument:</label>
-	<select ng-model="cfg.instrument" ng-options="item.name as item.name for item in instruments" data-ng-change="change()"></select>
+	<select id="instrument" data-ng-model="cfg.instrument"
+            data-ng-options="item.name as item.name for item in instruments" data-ng-change="change()"></select>
     <br/>
 
 </div>
