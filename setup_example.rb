@@ -31,7 +31,8 @@ if (Dir.entries working_copy user).sort! == ['.', '..']
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} submit -d "Initial import of **_configuration.json/html"]
 end
 
-branch p4port, user, password, 'staging', 'dev'
+branch p4port, user, password, 'qa', 'dev'
+branch p4port, user, password, 'staging', 'qa'
 branch p4port, user, password, 'prod', 'staging'
 
 add_user p4port, 'sally-runtime', 'sally@test.com', 'bananas'

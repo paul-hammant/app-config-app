@@ -42,7 +42,7 @@ def branch(p4port = nil, user = nil, password = nil, new_branch = nil, source_br
   new_branch ||= prompt 'branch'
   source_branch ||= prompt 'source branch'
 
-  form  = "Branch: #{new_branch}" + '\n\n'
+  form  = "Branch: #{source_branch}-#{new_branch}" + '\n\n'
   form += "Owner: #{user}" + '\n\n'
   form += "Options: unlocked" + '\n\n'
   form += "View:" + '\n\n'
