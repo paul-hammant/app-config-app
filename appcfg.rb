@@ -111,6 +111,19 @@ module AppCfg
       }
     end
 
+    get '/hello' do
+      "hello"
+    end
+
+    get '/branchMappings' do
+      erb :branchMappings, :layout => !request.xhr?, locals: { }
+    end
+
+
+    get '/branchMappings.json' do
+      (p4branches.split(' ')).select { |x| x.include? '-' }.to_json.gsub(/,/,'} , {"name:":').gsub(/\[/,'[{"name:":').gsub(/\]/,'}]')
+    end
+
     get '/*' do
       sync
       resource_uri = params[:splat][0]

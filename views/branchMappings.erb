@@ -1,0 +1,24 @@
+<% content_for :title do "Branch Mappings" end %>
+
+<script type="text/javascript">
+    //<![CDATA[
+
+    angular.module("branchMappings", ["ngResource"]).factory("BranchMappingsModel", function ($resource) {
+        return $resource("/branchMappings.json");
+    });
+
+    function BranchMappingsController($scope, BranchMappingsModel) {
+        $scope.mappings = BranchesCfgModel.get();
+    }
+
+    //]]>
+</script>
+
+<div data-ng-app="branchMappings" data-ng-controller="BranchMappingsController">
+
+  Mappings:<br/>
+  <ol>
+    <li data-ng-repeat="mapping in mappings">{{branch.name}}</li>
+  </ol>
+
+</div>

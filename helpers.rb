@@ -76,6 +76,10 @@ module AppCfg
       [%x[#{p4} revert #{ensure_escaped resource} 2>&1], $?]
     end
 
+    def p4branches
+      %x[#{p4} branches 2>&1]
+    end
+
     def p4sync(username = nil, password = nil)
       [%x[#{p4 username, password} sync 2>&1], $?]
     end
