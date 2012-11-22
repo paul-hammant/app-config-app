@@ -51,7 +51,7 @@ def branch(p4port = nil, user = nil, password = nil, new_branch = nil, source_br
   puts "Creating branch #{new_branch}..."
   puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client branch -i]
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client integrate -b #{new_branch}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "Created branch #{new_branch} from #{source_branch}"]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "(admin.rb) Created branch #{new_branch} from #{source_branch}"]
 end
 
 def client_name(user)

@@ -14,9 +14,11 @@ protect += '\tread user sally-runtime * //depot/app-config-app/staging/...\n\n'
 protect += '\tread user sally-runtime * //depot/app-config-app/dev/...\n\n'
 protect += '\twrite user joe-developer * //depot/app-config-app/dev/...\n\n'
 protect += '\twrite user jimmy-qa * //depot/app-config-app/staging/...\n\n'
+protect += '\twrite user jimmy-qa * //depot/app-config-app/qa/...\n\n'
 protect += '\tread user jimmy-qa * //depot/app-config-app/dev/...\n\n'
 protect += '\tread user dev-app * //depot/app-config-app/dev/...\n\n'
 protect += '\tread user qa-app * //depot/app-config-app/staging/...\n\n'
+protect += '\tread user qa-app * //depot/app-config-app/qa/...\n\n'
 protect += '\tread user prod-app * //depot/app-config-app/prod/...\n\n'
 
 puts %x[echo "#{protect}" | p4 -p #{p4port} protect -i]
@@ -28,7 +30,7 @@ if (Dir.entries working_copy user).sort! == ['.', '..']
   puts %x[mkdir -p #{(File.join (working_copy user), 'dev')}]
   puts %x[cp example_config/* #{(File.join (working_copy user), 'dev/')}]
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} add #{File.join (working_copy user), 'dev/*'}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} submit -d "Initial import of **_configuration.json/html"]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} submit -d "(setup_example.rb) Initial import of **_configuration.json/html"]
 end
 
 branch p4port, user, password, 'qa', 'dev'
