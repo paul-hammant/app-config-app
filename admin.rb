@@ -48,7 +48,7 @@ def branch(p4port = nil, user = nil, password = nil, new_branch = nil, source_br
   form += "View:" + '\n\n'
   form += '\t' + "//depot/app-config-app/#{source_branch}... //depot/app-config-app/#{new_branch}..." + '\n\n'
 
-  puts "Creating branch #{new_branch}..."
+  puts "Creating branch #{source_branch}-#{new_branch}..."
   puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client branch -i]
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client integrate -b #{source_branch}-#{new_branch}]
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "(admin.rb) Created branch #{new_branch} from #{source_branch}"]
