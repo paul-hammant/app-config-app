@@ -8,7 +8,7 @@
     });
 
     function BranchMappingsController($scope, BranchMappingsModel) {
-        $scope.mappings = BranchesCfgModel.get();
+        $scope.mappings = BranchMappingsModel.get();
     }
 
     //]]>
@@ -16,9 +16,9 @@
 
 <div data-ng-app="branchMappings" data-ng-controller="BranchMappingsController">
 
-  Mappings:<br/>
+  Mappings: q{{mappings.length}}<br/>
   <ol>
-    <li data-ng-repeat="mapping in mappings">{{branch.name}}</li>
+    <li ng-repeat="mapping in mappings">from {{mapping.from}} to {{mapping.to}}</li>
   </ol>
 
 </div>

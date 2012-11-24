@@ -121,8 +121,19 @@ module AppCfg
 
 
     get '/branchMappings.json' do
-      (p4branches.split(' ')).select { |x| x.include? '-' }.to_json.gsub(/,/,'} , {"name:":').gsub(/\[/,'[{"name:":').gsub(/\]/,'}]')
+      mappings = (p4branches.split(' ')).select { |x| x.include? '-' }
+      array = []
+      mappings.each { |x|
+        bm = x.split('-')
+        array << {
+            "from" => bm[0],
+            "to" => bm[1]
+        }
+      }
+      array.to_json
     end
+
+
 
     get '/*' do
       sync
