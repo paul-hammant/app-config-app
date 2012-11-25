@@ -77,7 +77,7 @@ module AppCfg
     end
 
     def p4branches
-      %x[#{p4} branches 2>&1]
+      [%x[#{p4} branches 2>&1], $?]
     end
 
     def p4sync(username = nil, password = nil)

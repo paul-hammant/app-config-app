@@ -121,15 +121,15 @@ module AppCfg
 
 
     get '/branchMappings.json' do
-      mappings = (p4branches.split(' ')).select { |x| x.include? '-' }
+      mappings = (try p4branches).split(' ').select { |x| x.include? '-' }
       array = []
-      mappings.each { |x|
+      mappings.each do |x|
         bm = x.split('-')
         array << {
             "from" => bm[0],
             "to" => bm[1]
         }
-      }
+      end
       array.to_json
     end
 
