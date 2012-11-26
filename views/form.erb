@@ -10,9 +10,16 @@
     function AppCfg($scope, $http, AppCfgModel) {
         $scope.cfg = AppCfgModel.get();
 
+        $scope.updateDigest = function () {
+            $http.get("/<%= cfg_form.sub /json$/, 'md5' %>").success(function (response) {
+                $scope.digest = response;
+            });
+        };
+
         $scope.change = function () {
-                $scope.cfg.$save(function () {
+            $scope.cfg.$save(function () {
                 $scope.changed = false;
+                $scope.updateDigest();
             }, function () {
                 alert("Error occurred during save.");
                 $scope.changed = false;
@@ -63,6 +70,8 @@
             $scope.change();
         };
 
+        $scope.updateDigest();
+
         <%= js %>
     }
 
@@ -71,6 +80,8 @@
 
 <div data-ng-app="appcfg" data-ng-controller="AppCfg" id="config-form">
     <h2><%= cfg_form %></h2>
+    <p>MD5 {{digest}}<br/>
+        <a href="/<%= cfg_form %>">Raw JSON</a></p>
     <%= form %>
     <p>
         <button data-ng-click="diffs()">View Diff</button>

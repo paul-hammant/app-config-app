@@ -23,7 +23,7 @@ module AppCfg
   class App < BaseApp
     extend Helpers
 
-    use Rack::Auth::Basic, "Protected Area" do |username, password|
+    use Rack::Auth::Basic, 'Protected Area' do |username, password|
       _, code = p4sync username, password
       if code == 0
         Thread.current[:username] = username
@@ -116,9 +116,8 @@ module AppCfg
     end
 
     get '/branchMappings' do
-      erb :branchMappings, :layout => !request.xhr?, locals: { }
+      erb :branchMappings, :layout => !request.xhr?
     end
-
 
     get '/branchMappings.json' do
       mappings = (try p4branches).split(' ').select { |x| x.include? '-' }
@@ -126,14 +125,12 @@ module AppCfg
       mappings.each do |x|
         bm = x.split('-')
         array << {
-            "from" => bm[0],
-            "to" => bm[1]
+            :from => bm[0],
+            :to => bm[1]
         }
       end
       array.to_json
     end
-
-
 
     get '/*' do
       sync
@@ -141,7 +138,7 @@ module AppCfg
       resource = path_to resource_uri
       extension = extension_of resource
       if extension == 'json'
-        content_type 'application/json'
+        content_type (/MSIE|Firefox|Chrome|Safari/i =~ request.user_agent) ? 'text/plain' : 'application/json'
         File.open(resource) {|file| file.read}
       elsif extension == 'md5'
         content_type 'text/plain'
@@ -155,7 +152,7 @@ module AppCfg
         erb :form, locals: {
             cfg_form: json_resource,
             form: File.open(resource) {|file| file.read},
-            js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : '',
+            js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : ''
         }
       end
     end
