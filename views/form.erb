@@ -88,8 +88,15 @@
 </script>
 
 <div data-ng-app="appcfg" data-ng-controller="AppCfg" id="config-form">
-    <h2><%= cfg_form %></h2>
-    <p>MD5 {{digest}}{{changesFlag}}<br/>
+    <div >
+      <div style="float: left; font-size: 16px;"><%= cfg_form %></div>
+      <div style="float: right;">
+        <span>{{digest}}</span>
+        <span style="color: red;">{{changesFlag}}</span>
+      </div>
+      <div style="clear: both;"/>
+    </div>
+
         <a href="/<%= cfg_form %>">Raw JSON</a></p>
     <%= form %>
     <p>
