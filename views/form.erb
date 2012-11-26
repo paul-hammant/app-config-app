@@ -24,8 +24,7 @@
         $scope.change = function () {
             $scope.cfg.$save(function () {
                 $scope.changed = false;
-                $scope.updateDigest();
-                $scope.hasChanges();
+                $scope.detectChanges();
             }, function () {
                 alert("Error occurred during save");
                 $scope.changed = false;
@@ -42,6 +41,11 @@
             });
         };
 
+        $scope.detectChanges = function () {
+            $scope.hasChanges();
+            $scope.updateDigest();
+        };
+
         $scope.diffs = function () {
             $http.get("/<%= cfg_form.sub /json$/, 'diffs' %>").success(function (response) {
                 $scope.statusMessage = response;
@@ -56,6 +60,7 @@
                 $http.post("/revert/<%= cfg_form %>").success(function (response) {
                     $scope.cfg.$get({}, function () {
                         $scope.statusMessage = response;
+                        $scope.detectChanges();
                     },  function (code, response) {
                         $scope.statusMessage = "";
                         alert("Revert succeeded, reload failed");
@@ -86,8 +91,7 @@
             $scope.change();
         };
 
-        $scope.updateDigest();
-        $scope.hasChanges();
+        $scope.detectChanges();
 
         <%= js %>
     }
