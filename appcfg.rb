@@ -48,15 +48,8 @@ module AppCfg
 
     get '/' do
       sync
-      forms = {}
-      Dir.glob "#{working_copy}/**/*.html" do |file|
-        file = file.gsub /(^#{Regexp.escape working_copy}\/)/, ''
-        env = file[/^[^\/]+/] || '.'
-        forms[env] ||= []
-        forms[env].push file.gsub /^#{env}\//, ''
-      end
       erb :config_forms, locals: {
-          forms: forms,
+          forms: (directory_hash working_copy),
       }
     end
 
@@ -121,27 +114,27 @@ module AppCfg
       js_resource = path_to params[:splat][0] + '.js'
       erb :form, locals: {
           cfg_form: json_resource,
-          form: File.open(resource) {|file| file.read},
-          js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : ''
+          form: File.open(resource) { |file| file.read },
+          js: File.exists?(js_resource) ? File.open(js_resource) { |file| file.read } : ''
       }
     end
 
     get '/*.json' do
       sync
       content_type (/MSIE|Firefox|Chrome|Safari/i =~ request.user_agent) ? 'text/plain' : 'application/json'
-      File.open(path_to params[:splat][0] + '.json') {|file| file.read}
+      File.open(path_to params[:splat][0] + '.json') { |file| file.read }
     end
 
     get '/*.md5' do
       sync
       content_type 'text/plain'
-      File.open(path_to params[:splat][0] + '.json') {|file| Digest::MD5.hexdigest file.read}
+      File.open(path_to params[:splat][0] + '.json') { |file| Digest::MD5.hexdigest file.read }
     end
 
     get '/*.js' do
       sync
       content_type 'text/javascript'
-      File.open(path_to params[:splat][0]) {|file| file.read}
+      File.open(path_to params[:splat][0]) { |file| file.read }
     end
 
     get '/*.changed' do

@@ -1,13 +1,7 @@
 <% content_for :title do "Config Forms" end %>
 
 <ul class="config-forms">
-  <% forms.each do |env, files| %>
-      <li><%= env %>
-          <ul>
-          <% files.each do |file| %>
-              <li><a href="/<%= env %>/<%= file %>"><%= file %></a></li>
-          <% end %>
-          </ul>
-      </li>
+  <% forms[:children].each do |entry| %>
+  <%= tree_list entry %>
   <% end %>
 </ul>

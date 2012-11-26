@@ -133,7 +133,41 @@ module AppCfg
     end
 
     def working_copy
-      File.join File.dirname(__FILE__), 'wc', session[:username]
+      File.join (File.dirname __FILE__), 'wc', session[:username]
+    end
+
+    def directory_hash(path, name=nil)
+      name = name || path
+      entry = {
+          path: path,
+          name: name,
+          directory?: (File.directory? path)
+      }
+      if File.directory? path
+        entry[:children] = []
+        Dir.foreach path do |child|
+          next if %w[. ..].include? child
+          entry[:children] << (directory_hash (File.join path, child), child)
+        end
+      end
+      entry
+    end
+
+    def tree_list(entry)
+      output = ''
+      if entry[:directory?]
+        output += '<li>' + entry[:name] + "\n"
+        output += '<ul>' + "\n"
+        entry[:children].each { |child| output += tree_list child }
+        output += '</ul>' + "\n"
+        output += '</li>' + "\n"
+      elsif entry[:name].include? '.html'
+        output += '<li>'
+        output += '<a href="' + (entry[:path].sub /^#{Regexp.escape working_copy}\//, '') + '">'
+        output += entry[:name] + '</a>'
+        output += '</li>' + "\n"
+      end
+      output
     end
   end
 end

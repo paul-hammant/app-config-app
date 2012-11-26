@@ -66,14 +66,9 @@ section.content {
     color: red;
 }
 
-.config-forms li {
-    text-transform: capitalize;
-}
-
-.config-forms li li {
+.config-forms {
     font-family: monospace;
     font-size: 1.2em;
-    text-transform: none;
 }
 
 #config-form h2 {
