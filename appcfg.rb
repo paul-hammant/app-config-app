@@ -177,10 +177,9 @@ module AppCfg
     end
 
     def merge(mapping, reverse)
-      message = try p4integrate mapping, reverse
-      message += "\n" + (try p4resolve mapping.split('-')[reverse ? 0 : 1], 'at')
+      try p4integrate mapping, reverse
+      try p4resolve mapping.split('-')[reverse ? 0 : 1], 'at'
       erb :merge, layout: !request.xhr?, locals: {
-          output: message,
           mapping: mapping,
           reverse: reverse,
       }
