@@ -1,0 +1,9 @@
+<h2>Merge Result</h2>
+
+<% if reverse %>
+<% from, to = (mapping.split '-').reverse! %>
+<% else %>
+<% from, to = mapping.split '-' %>
+<% end %>
+<p>Successfully merged from <%= from %> to <%= to %>. Review your changes before you commit.</p>
+<%= output %>

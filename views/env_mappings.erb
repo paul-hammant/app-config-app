@@ -12,8 +12,14 @@
         });
     });
 
-    function EnvironmentMappingsController($scope, EnvironmentMappings) {
+    function EnvironmentMappingsController($scope, $http, EnvironmentMappings) {
         $scope.mappings = EnvironmentMappings.get();
+
+        $scope.merge = function (mapping, reverse) {
+            $http.post("/merge/" + mapping.from + "-" + mapping.to + (reverse ? "/reverse" : "")).success(function () {
+                alert("Merge successful");
+            });
+        };
     }
 
 //]]>
@@ -21,9 +27,24 @@
 
 <div data-ng-app="env-mappings" data-ng-controller="EnvironmentMappingsController">
 
-    Mappings: q{{mappings.length}}<br/>
-    <ol>
-        <li data-ng-repeat="mapping in mappings">from {{mapping.from}} to {{mapping.to}}</li>
-    </ol>
+    <p>Mappings: q{{mappings.length}}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th align="right">Source</th>
+                <th colspan="2" align="center">Merge</th>
+                <th>Destination</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="mapping in mappings">
+                <td align="right">{{mapping.from}}</td>
+                <td><form action="/merge/{{mapping.from}}-{{mapping.to}}/reverse" method="post"><input type="submit" value="&lt;"/></form></td>
+                <td><form action="/merge/{{mapping.from}}-{{mapping.to}}" method="post"><input type="submit" value="&gt;"/></form></td>
+                <td>{{mapping.to}}</td>
+            </tr>
+        </tbody>
+    </table>
 
 </div>

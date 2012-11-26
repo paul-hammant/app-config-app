@@ -16,7 +16,7 @@
                         alert("Revert failed!");
                     });
             }
-        }
+        };
 
         $scope.commit = function () {
             if (!$scope.message) {
@@ -30,6 +30,10 @@
                         alert("Commit failed!");
                     });
             }
+        };
+
+        $scope.edit = function (url) {
+            window.location = url;
         }
     }
 //]]>
@@ -45,6 +49,7 @@
     <% edited_files.each do |edited_file| %>
         <tr>
             <td><strong><%= h edited_file[:filename] %></strong></td>
+            <td><input type="submit" value="Edit" data-ng-click="edit('<%= h edited_file[:filename].sub /json$/, 'html' %>')"/></td>
             <td><input type="submit" value="Revert Changes" data-ng-click="revert('/revert/<%= h edited_file[:filename] %>')"/></td>
         </tr>
         <tr>

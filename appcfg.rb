@@ -80,14 +80,14 @@ module AppCfg
     post '/revert/*' do
       resource = params[:splat][0]
       try p4revert path_to resource
-      erb :revert, :layout => !request.xhr?, locals: {
+      erb :revert, layout: !request.xhr?, locals: {
           filename: resource
       }
     end
 
     post '/sync' do
       message, code = p4sync
-      erb :sync, :layout => !request.xhr?, locals: {
+      erb :sync, layout: !request.xhr?, locals: {
           message: message,
           code: code
       }
@@ -98,7 +98,7 @@ module AppCfg
     end
 
     get '/env_mappings' do
-      erb :env_mappings, :layout => !request.xhr?
+      erb :env_mappings, layout: !request.xhr?
     end
 
     get '/env_mappings.json' do
@@ -153,7 +153,7 @@ module AppCfg
     get '/*.diffs' do
       resource_short = params[:splat][0] + '.json'
       resource = path_to resource_short
-      erb :diffs, :layout => !request.xhr?, locals: {
+      erb :diffs, layout: !request.xhr?, locals: {
           filename: resource_short,
           diffs: (diffs_for resource),
       }
@@ -165,6 +165,25 @@ module AppCfg
       File.open resource, 'w+' do |file|
         file.write JSON.pretty_generate JSON.parse request.body.read
       end
+      204
+    end
+
+    post '/merge/:mapping' do
+      merge params[:mapping], false
+    end
+
+    post '/merge/:mapping/reverse' do
+      merge params[:mapping], true
+    end
+
+    def merge(mapping, reverse)
+      message = try p4integrate mapping, reverse
+      message += "\n" + (try p4resolve mapping.split('-')[reverse ? 0 : 1], 'at')
+      erb :merge, layout: !request.xhr?, locals: {
+          output: message,
+          mapping: mapping,
+          reverse: reverse,
+      }
     end
   end
 
