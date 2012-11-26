@@ -4,6 +4,9 @@
 //<![CDATA[
 
     angular.module("appcfg", ["ngResource"]).factory("AppCfgModel", function ($resource) {
+        /**
+         * Creates service binding to the JSON resource (aardvark_configuration.json, for example)
+         */
         return $resource("/<%= cfg_form %>");
     });
 
@@ -72,11 +75,17 @@
             }
         };
 
+        /**
+         * API method to add list items (see aardvark_configuration.html "Banned Nicks" for usage)
+         */
         $scope.addListItem = function (list, item) {
             list.push(item);
             $scope.change();
         };
 
+        /**
+         * API method to remove list items (see aardvark_configuration.html "Banned Nicks" for usage)
+         */
         $scope.removeListItem = function (list, item) {
             var newList = [];
             while (list.length > 0) {
@@ -93,6 +102,9 @@
 
         $scope.detectChanges();
 
+        /**
+         * Custom JavaScript will be inserted here if you have a *.js file (instruments_configuration.js, for example)
+         */
         <%= js %>
     }
 
@@ -110,6 +122,7 @@
     </div>
     <hr/>
 
+    <!-- Custom input form will be inserted here (aardvark_configuration.html, for example) -->
     <%= form %>
 
     <hr/>
