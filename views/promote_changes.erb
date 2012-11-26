@@ -3,8 +3,8 @@
 <script type="text/javascript">
 //<![CDATA[
 
-    angular.module("env-mappings", ["ngResource"]).factory("EnvironmentMappings", function ($resource) {
-        return $resource("/env_mappings.json", {}, {
+    angular.module("promote-changes", ["ngResource"]).factory("ChangeMappings", function ($resource) {
+        return $resource("/change_mappings.json", {}, {
             get: {
                 method: "GET",
                 isArray: true
@@ -12,8 +12,8 @@
         });
     });
 
-    function EnvironmentMappingsController($scope, $http, EnvironmentMappings) {
-        $scope.mappings = EnvironmentMappings.get();
+    function PromoteChangesController($scope, $http, ChangeMappings) {
+        $scope.mappings = ChangeMappings.get();
 
         $scope.merge = function (mapping, reverse) {
             $http.post("/merge/" + mapping.from + "-" + mapping.to + (reverse ? "/reverse" : "")).success(function () {
@@ -25,7 +25,7 @@
 //]]>
 </script>
 
-<div data-ng-app="env-mappings" data-ng-controller="EnvironmentMappingsController">
+<div data-ng-app="promote-changes" data-ng-controller="PromoteChangesController">
 
     <p>Mappings: q{{mappings.length}}</p>
 

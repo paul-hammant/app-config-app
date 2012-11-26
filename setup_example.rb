@@ -33,9 +33,9 @@ if (Dir.entries working_copy user).sort! == %w[. ..]
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} submit -d "(setup_example.rb) Initial import of **_configuration.json/html/js (examples)"]
 end
 
-map_env p4port, user, password, 'qa', 'dev'
-map_env p4port, user, password, 'staging', 'qa'
-map_env p4port, user, password, 'prod', 'staging'
+map_changes p4port, user, password, 'qa', 'dev'
+map_changes p4port, user, password, 'staging', 'qa'
+map_changes p4port, user, password, 'prod', 'staging'
 
 add_user p4port, 'sally-runtime', 'sally@test.com', 'bananas'
 add_user p4port, 'joe-developer', 'joe@test.com', 'oranges'

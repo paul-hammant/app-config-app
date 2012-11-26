@@ -35,7 +35,7 @@ def add_user(p4port = nil, user = nil, email = nil, password = nil)
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} sync]
 end
 
-def map_env(p4port = nil, user = nil, password = nil, new_env = nil, source_env = nil)
+def map_changes(p4port = nil, user = nil, password = nil, new_env = nil, source_env = nil)
   p4port ||= prompt 'p4port', ENV['P4PORT']
   user ||= prompt 'username'
   password ||= prompt 'password'
@@ -48,10 +48,10 @@ def map_env(p4port = nil, user = nil, password = nil, new_env = nil, source_env 
   form += "View:" + '\n\n'
   form += '\t' + "//depot/app-config-app/#{source_env}... //depot/app-config-app/#{new_env}..." + '\n\n'
 
-  puts "Creating environment mapping #{source_env}-#{new_env}..."
+  puts "Creating change mapping #{source_env}-#{new_env}..."
   puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client branch -i]
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client integrate -b #{source_env}-#{new_env}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "(admin.rb) Created environment #{new_env} from #{source_env}"]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "(admin.rb) Created change mapping from #{source_env} to #{new_env}"]
 end
 
 def client_name(user)

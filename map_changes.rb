@@ -1,3 +1,3 @@
 require_relative 'admin'
 
-map_env
+map_changes

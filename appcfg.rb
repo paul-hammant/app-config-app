@@ -90,11 +90,11 @@ module AppCfg
       "hello"
     end
 
-    get '/env_mappings' do
-      erb :env_mappings, layout: !request.xhr?
+    get '/promote_changes' do
+      erb :promote_changes, layout: !request.xhr?
     end
 
-    get '/env_mappings.json' do
+    get '/change_mappings.json' do
       mappings = (try p4branches).split(' ').select { |x| x.include? '-' }
       array = []
       mappings.each do |x|
