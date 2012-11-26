@@ -8,7 +8,12 @@
     });
 
     function AppCfg($scope, $http, AppCfgModel) {
+
+        $scope.unChangedStyle = {color: "black"};
+        $scope.changedStyle = {color: "red"};
+
         $scope.cfg = AppCfgModel.get();
+        $scope.digestStyle = $scope.unChangedStyle;
 
         $scope.updateDigest = function () {
             $http.get("/<%= cfg_form.sub /json$/, 'md5' %>").success(function (response) {
@@ -29,7 +34,11 @@
 
         $scope.hasChanges = function () {
             $http.get("/<%= cfg_form.sub /json$/, 'changed' %>").success(function (response) {
-                $scope.changesFlag = (response == "true") ? "*" : "";
+                if (response == "true") {
+                    $scope.digestStyle = $scope.changedStyle;
+                } else {
+                    $scope.digestStyle = $scope.unChangedStyle;
+                }
             });
         };
 
@@ -45,7 +54,6 @@
         $scope.revert = function () {
             if (confirm("Are you sure?\nYou will lose any changes.")) {
                 $http.post("/revert/<%= cfg_form %>").success(function (response) {
-                    $scope.changesFlag = "";
                     $scope.cfg.$get({}, function () {
                         $scope.statusMessage = response;
                     },  function (code, response) {
@@ -91,8 +99,7 @@
     <div >
       <div style="float: left; font-size: 16px;"><%= cfg_form %></div>
       <div style="float: right;">
-        <span>{{digest}}</span>
-        <span style="color: red;">{{changesFlag}}</span>
+        <span ng-style="digestStyle">{{digest}}</span>
         <span><a href="/<%= cfg_form %>">(source)</a></span>
       </div>
       <div style="clear: both;"/>
@@ -105,4 +112,6 @@
         <button data-ng-click="revert()">Revert</button>
     </p>
     <div id="status_message" data-ng-bind-html-unsafe="statusMessage"></div>
+
+    {{digestClass}}
 </div>
