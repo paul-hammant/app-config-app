@@ -107,11 +107,11 @@
     <hr/>
 
     <%= form %>
+
+    <hr/>
     <p>
         <button data-ng-click="diffs()">View Diff</button>
         <button data-ng-click="revert()">Revert</button>
     </p>
     <div id="status_message" data-ng-bind-html-unsafe="statusMessage"></div>
-
-    {{digestClass}}
 </div>
