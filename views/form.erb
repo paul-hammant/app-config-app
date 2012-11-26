@@ -93,11 +93,12 @@
       <div style="float: right;">
         <span>{{digest}}</span>
         <span style="color: red;">{{changesFlag}}</span>
+        <span><a href="/<%= cfg_form %>">(source)</a></span>
       </div>
       <div style="clear: both;"/>
     </div>
+    <hr/>
 
-        <a href="/<%= cfg_form %>">Raw JSON</a></p>
     <%= form %>
     <p>
         <button data-ng-click="diffs()">View Diff</button>
