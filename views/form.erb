@@ -20,14 +20,21 @@
             $scope.cfg.$save(function () {
                 $scope.changed = false;
                 $scope.updateDigest();
+                $scope.hasChanges();
             }, function () {
                 alert("Error occurred during save.");
                 $scope.changed = false;
             });
-        }
+        };
+
+        $scope.hasChanges = function () {
+            $http.get("/<%= cfg_form.sub /json$/, 'changed' %>").success(function (response) {
+                $scope.changesFlag = (response == "true") ? "*" : "";
+            });
+        };
 
         $scope.diffs = function () {
-            $http.get("/diffs/<%= cfg_form %>").success(function (response) {
+            $http.get("/<%= cfg_form.sub /json$/, 'diffs' %>").success(function (response) {
                 $scope.statusMessage = response;
             }).failure(function () {
                 $scope.statusMessage = "";
@@ -38,6 +45,7 @@
         $scope.revert = function () {
             if (confirm("Are you sure?\nYou will lose any changes.")) {
                 $http.post("/revert/<%= cfg_form %>").success(function (response) {
+                    $scope.changesFlag = "";
                     $scope.cfg.$get({}, function () {
                         $scope.statusMessage = response;
                     },  function (code, response) {
@@ -71,6 +79,7 @@
         };
 
         $scope.updateDigest();
+        $scope.hasChanges();
 
         <%= js %>
     }
@@ -80,7 +89,7 @@
 
 <div data-ng-app="appcfg" data-ng-controller="AppCfg" id="config-form">
     <h2><%= cfg_form %></h2>
-    <p>MD5 {{digest}}<br/>
+    <p>MD5 {{digest}}{{changesFlag}}<br/>
         <a href="/<%= cfg_form %>">Raw JSON</a></p>
     <%= form %>
     <p>

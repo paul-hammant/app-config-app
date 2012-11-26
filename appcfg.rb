@@ -72,15 +72,6 @@ module AppCfg
       try p4commit message
     end
 
-    get '/diffs/*' do
-      resource_short = params[:splat][0]
-      resource = path_to resource_short
-      erb :diffs, :layout => !request.xhr?, locals: {
-          filename: resource_short,
-          diffs: (diffs_for resource),
-      }
-    end
-
     get '/logout' do
       if params[:confirm].nil? and (parse_diffs p4diff[0]).length > 0
         erb :confirm_logout
@@ -132,47 +123,57 @@ module AppCfg
       array.to_json
     end
 
-    get '/*' do
+    get '/*.html' do
       sync
-      resource_uri = params[:splat][0]
-      resource = path_to resource_uri
-      extension = extension_of resource
-      if extension == 'json'
-        content_type (/MSIE|Firefox|Chrome|Safari/i =~ request.user_agent) ? 'text/plain' : 'application/json'
-        File.open(resource) {|file| file.read}
-      elsif extension == 'md5'
-        content_type 'text/plain'
-        File.open(resource.sub /md5$/, 'json') {|file| Digest::MD5.hexdigest file.read}
-      elsif extension == 'js'
-        content_type 'text/javascript'
-        File.open(resource) {|file| file.read}
-      elsif extension == 'html'
-        json_resource = resource_uri.sub /html$/, 'json'
-        js_resource = path_to resource_uri.sub /html$/, 'js'
-        erb :form, locals: {
-            cfg_form: json_resource,
-            form: File.open(resource) {|file| file.read},
-            js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : ''
-        }
-      end
+      resource = path_to params[:splat][0] + '.html'
+      json_resource = params[:splat][0] + '.json'
+      js_resource = path_to params[:splat][0] + '.js'
+      erb :form, locals: {
+          cfg_form: json_resource,
+          form: File.open(resource) {|file| file.read},
+          js: File.exists?(js_resource) ? File.open(js_resource) {|file| file.read} : ''
+      }
     end
 
-    post '/*' do
-      resource = path_to params[:splat][0]
-      if (extension_of resource) != 'json'
-        raise 'Only JSON files may be edited'
-      end
-      if File.exists? resource
-        try p4edit resource
-      else
-        FileUtils.mkdir_p File.dirname resource
-        FileUtils.touch resource
-        try p4add resource
-      end
+    get '/*.json' do
+      sync
+      content_type (/MSIE|Firefox|Chrome|Safari/i =~ request.user_agent) ? 'text/plain' : 'application/json'
+      File.open(path_to params[:splat][0] + '.json') {|file| file.read}
+    end
+
+    get '/*.md5' do
+      sync
+      content_type 'text/plain'
+      File.open(path_to params[:splat][0] + '.json') {|file| Digest::MD5.hexdigest file.read}
+    end
+
+    get '/*.js' do
+      sync
+      content_type 'text/javascript'
+      File.open(path_to params[:splat][0]) {|file| file.read}
+    end
+
+    get '/*.changed' do
+      sync
+      content_type 'text/plain'
+      (diffs_for path_to params[:splat][0] + '.json') == '' ? 'false' : 'true'
+    end
+
+    get '/*.diffs' do
+      resource_short = params[:splat][0] + '.json'
+      resource = path_to resource_short
+      erb :diffs, :layout => !request.xhr?, locals: {
+          filename: resource_short,
+          diffs: (diffs_for resource),
+      }
+    end
+
+    post '/*.json' do
+      resource = path_to params[:splat][0] + '.json'
+      try p4edit resource
       File.open resource, 'w+' do |file|
         file.write JSON.pretty_generate JSON.parse request.body.read
       end
-      204
     end
   end
 
