@@ -106,11 +106,11 @@ module AppCfg
       "hello"
     end
 
-    get '/branchMappings' do
-      erb :branchMappings, :layout => !request.xhr?
+    get '/env_mappings' do
+      erb :env_mappings, :layout => !request.xhr?
     end
 
-    get '/branchMappings.json' do
+    get '/env_mappings.json' do
       mappings = (try p4branches).split(' ').select { |x| x.include? '-' }
       array = []
       mappings.each do |x|

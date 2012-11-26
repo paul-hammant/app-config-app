@@ -1,0 +1,29 @@
+<% content_for :title do "Environment Mappings" end %>
+
+<script type="text/javascript">
+//<![CDATA[
+
+    angular.module("env-mappings", ["ngResource"]).factory("EnvironmentMappings", function ($resource) {
+        return $resource("/env_mappings.json", {}, {
+            get: {
+                method: "GET",
+                isArray: true
+            }
+        });
+    });
+
+    function EnvironmentMappingsController($scope, EnvironmentMappings) {
+        $scope.mappings = EnvironmentMappings.get();
+    }
+
+//]]>
+</script>
+
+<div data-ng-app="env-mappings" data-ng-controller="EnvironmentMappingsController">
+
+    Mappings: q{{mappings.length}}<br/>
+    <ol>
+        <li data-ng-repeat="mapping in mappings">from {{mapping.from}} to {{mapping.to}}</li>
+    </ol>
+
+</div>

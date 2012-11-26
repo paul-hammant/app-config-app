@@ -35,23 +35,23 @@ def add_user(p4port = nil, user = nil, email = nil, password = nil)
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} sync]
 end
 
-def branch(p4port = nil, user = nil, password = nil, new_branch = nil, source_branch = nil)
+def map_env(p4port = nil, user = nil, password = nil, new_env = nil, source_env = nil)
   p4port ||= prompt 'p4port', ENV['P4PORT']
   user ||= prompt 'username'
   password ||= prompt 'password'
-  new_branch ||= prompt 'branch'
-  source_branch ||= prompt 'source branch'
+  new_env ||= prompt 'new environment'
+  source_env ||= prompt 'source environment'
 
-  form  = "Branch: #{source_branch}-#{new_branch}" + '\n\n'
+  form  = "Branch: #{source_env}-#{new_env}" + '\n\n'
   form += "Owner: #{user}" + '\n\n'
   form += "Options: unlocked" + '\n\n'
   form += "View:" + '\n\n'
-  form += '\t' + "//depot/app-config-app/#{source_branch}... //depot/app-config-app/#{new_branch}..." + '\n\n'
+  form += '\t' + "//depot/app-config-app/#{source_env}... //depot/app-config-app/#{new_env}..." + '\n\n'
 
-  puts "Creating branch #{source_branch}-#{new_branch}..."
+  puts "Creating environment mapping #{source_env}-#{new_env}..."
   puts %x[echo "#{form}" | p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client branch -i]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client integrate -b #{source_branch}-#{new_branch}]
-  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "(admin.rb) Created branch #{new_branch} from #{source_branch}"]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client integrate -b #{source_env}-#{new_env}]
+  puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{user}Client submit -d "(admin.rb) Created environment #{new_env} from #{source_env}"]
 end
 
 def client_name(user)

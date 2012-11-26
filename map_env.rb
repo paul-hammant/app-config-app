@@ -1,3 +1,3 @@
 require_relative 'admin'
 
-branch
+map_env

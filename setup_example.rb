@@ -25,7 +25,7 @@ puts %x[echo "#{protect}" | p4 -p #{p4port} protect -i]
 
 add_user p4port, user, email, password
 
-if (Dir.entries working_copy user).sort! == ['.', '..']
+if (Dir.entries working_copy user).sort! == %w[. ..]
   puts "**_configuration files not under source control, adding them..."
   puts %x[mkdir -p #{(File.join (working_copy user), 'dev')}]
   puts %x[cp example_config/* #{(File.join (working_copy user), 'dev/')}]
@@ -33,9 +33,9 @@ if (Dir.entries working_copy user).sort! == ['.', '..']
   puts %x[p4 -p #{p4port} -u #{user} -P #{password} -c #{client_name user} submit -d "(setup_example.rb) Initial import of **_configuration.json/html/js (examples)"]
 end
 
-branch p4port, user, password, 'qa', 'dev'
-branch p4port, user, password, 'staging', 'qa'
-branch p4port, user, password, 'prod', 'staging'
+map_env p4port, user, password, 'qa', 'dev'
+map_env p4port, user, password, 'staging', 'qa'
+map_env p4port, user, password, 'prod', 'staging'
 
 add_user p4port, 'sally-runtime', 'sally@test.com', 'bananas'
 add_user p4port, 'joe-developer', 'joe@test.com', 'oranges'
