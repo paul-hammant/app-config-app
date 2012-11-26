@@ -122,7 +122,7 @@ module AppCfg
 
     get '/*.json' do
       sync
-      content_type (/MSIE|Firefox|Chrome|Safari/i =~ request.user_agent) ? 'text/plain' : 'application/json'
+      content_type (/MSIE|Firefox|Chrome|Safari|Opera/i =~ request.user_agent) ? 'text/plain' : 'application/json'
       File.open(path_to params[:splat][0] + '.json') { |file| file.read }
     end
 
