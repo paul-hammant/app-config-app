@@ -15,14 +15,9 @@
             <h1>App-Config-App | <%= h (yield_content :title).strip %></h1>
             <nav>
                 <ul>
-                    <% if session[:authenticated] %>
                     <li><a href="/">Home</a></li>
                     <% yield_content :nav %>
                     <li><a href="/changes">Pending Changes</a></li>
-                    <li><a href="/logout">Logout</a></li>
-                    <% else %>
-                    <li><a href="/login">Login</a></li>
-                    <% end %>
                 </ul>
             </nav>
         </header>

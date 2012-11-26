@@ -72,15 +72,6 @@ module AppCfg
       try p4commit message
     end
 
-    get '/logout' do
-      if params[:confirm].nil? and (parse_diffs p4diff[0]).length > 0
-        erb :confirm_logout
-      else
-        session.clear
-        redirect '/'
-      end
-    end
-
     post '/push' do
       content_type 'text/html', :charset => 'utf-8'
       %x[git push | aha --no-header]
