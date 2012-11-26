@@ -99,6 +99,7 @@ module AppCfg
       array = []
       mappings.each do |x|
         bm = x.split('-')
+        next unless (File.exists? path_to bm[0]) and (File.exists? path_to bm[1])
         array << {
             :from => bm[0],
             :to => bm[1]
