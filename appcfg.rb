@@ -90,8 +90,16 @@ module AppCfg
       "hello"
     end
 
-    get '/promote_changes' do
-      erb :promote_changes, layout: !request.xhr?
+    get '/promote' do
+      erb :promote, layout: !request.xhr?
+    end
+
+    post '/promote/:mapping' do
+      promote params[:mapping], false
+    end
+
+    post '/promote/:mapping/reverse' do
+      promote params[:mapping], true
     end
 
     get '/change_mappings.json' do
@@ -162,18 +170,10 @@ module AppCfg
       204
     end
 
-    post '/merge/:mapping' do
-      merge params[:mapping], false
-    end
-
-    post '/merge/:mapping/reverse' do
-      merge params[:mapping], true
-    end
-
-    def merge(mapping, reverse)
+    def promote(mapping, reverse)
       try p4integrate mapping, reverse
       try p4resolve mapping.split('-')[reverse ? 0 : 1], 'at'
-      erb :merge, layout: !request.xhr?, locals: {
+      erb :promote_result, layout: !request.xhr?, locals: {
           mapping: mapping,
           reverse: reverse,
       }

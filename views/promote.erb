@@ -33,15 +33,15 @@
         <thead>
             <tr>
                 <th align="right">Source</th>
-                <th colspan="2" align="center">Merge</th>
+                <th colspan="2" align="center">Promote</th>
                 <th>Destination</th>
             </tr>
         </thead>
         <tbody>
             <tr data-ng-repeat="mapping in mappings">
                 <td align="right">{{mapping.from}}</td>
-                <td><form action="/merge/{{mapping.from}}-{{mapping.to}}/reverse" method="post"><input type="submit" value="&lt;"/></form></td>
-                <td><form action="/merge/{{mapping.from}}-{{mapping.to}}" method="post"><input type="submit" value="&gt;"/></form></td>
+                <td><form action="/promote/{{mapping.from}}-{{mapping.to}}/reverse" method="post"><input type="submit" value="&lt;"/></form></td>
+                <td><form action="/promote/{{mapping.from}}-{{mapping.to}}" method="post"><input type="submit" value="&gt;"/></form></td>
                 <td>{{mapping.to}}</td>
             </tr>
         </tbody>
