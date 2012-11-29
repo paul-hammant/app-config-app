@@ -86,10 +86,6 @@ module AppCfg
       }
     end
 
-    get '/hello' do
-      "hello"
-    end
-
     get '/promote' do
       erb :promote, layout: !request.xhr?
     end
