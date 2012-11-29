@@ -186,6 +186,7 @@ module AppCfg
     end
 
     get '/' do
+      status flash[:status] || 500
       erb :error, locals: {
           message: flash[:error]
       }

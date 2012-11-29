@@ -126,6 +126,7 @@ module AppCfg
       end
       if code != 0
         request.logger.error message
+        flash[:status] = 500
         flash[:error] = message
         redirect '/error'
       end
