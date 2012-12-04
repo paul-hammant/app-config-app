@@ -15,11 +15,11 @@
     function PromoteChangesController($scope, $http, ChangeMappings) {
         $scope.mappings = ChangeMappings.get();
 
-        $scope.merge = function (mapping, reverse) {
-            $http.post("/merge/" + mapping.from + "-" + mapping.to + (reverse ? "/reverse" : "")).success(function () {
-                alert("Merge successful");
+        $scope.dryRun = function (mapping, reverse) {
+            $http.post("/promote/" + mapping.from + "-" + mapping.to + "?dry_run=true").success(function (response) {
+                alert(response.message);
             });
-        };
+        }
     }
 
 //]]>
@@ -33,18 +33,27 @@
         <thead>
             <tr>
                 <th align="right">Source</th>
-                <th colspan="2" align="center">Promote</th>
+                <th colspan="4" align="center">Promote</th>
                 <th>Destination</th>
             </tr>
         </thead>
         <tbody>
             <tr data-ng-repeat="mapping in mappings">
                 <td align="right">{{mapping.from}}<span data-ng-show="mapping.from_has_changes">*</span></td>
-                <td><form action="/promote/{{mapping.from}}-{{mapping.to}}/reverse" method="post">
-                    <input type="submit" value="&lt;" data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"/>
-                </form></td>
                 <td><form action="/promote/{{mapping.from}}-{{mapping.to}}" method="post">
-                    <input type="submit" value="&gt;" data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"/>
+                    <input type="hidden" name="reverse" value="true"/>
+                    <input type="submit" value="&lt;&lt;" data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"/>
+                </form></td>
+                <td>
+                    <button data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"
+                        data-ng-click="dryRun(mapping, true)">&lt;</button>
+                </td>
+                <td>
+                    <button data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"
+                           data-ng-click="dryRun(mapping, false)">&gt;</button>
+                </td>
+                <td><form action="/promote/{{mapping.from}}-{{mapping.to}}" method="post">
+                    <input type="submit" value="&gt;&gt;" data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"/>
                 </form></td>
                 <td>{{mapping.to}}<span data-ng-show="mapping.to_has_changes">*</span></td>
             </tr>
@@ -52,5 +61,7 @@
     </table>
 
     <p>*Has pending changes</p>
+    <p>2 arrows == actual merge<br/>
+        1 arrow == dry run</p>
 
 </div>

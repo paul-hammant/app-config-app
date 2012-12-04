@@ -91,11 +91,12 @@ module AppCfg
     end
 
     post '/promote/:mapping' do
-      promote params[:mapping], false
-    end
-
-    post '/promote/:mapping/reverse' do
-      promote params[:mapping], true
+      if params[:dry_run].nil?
+        promote params[:mapping], !params[:reverse].nil?
+      else
+        content_type 'application/json'
+        JSON.generate promote_dry_run params[:mapping], !params[:reverse].nil?
+      end
     end
 
     get '/change_mappings.json' do
@@ -166,6 +167,20 @@ module AppCfg
         file.write JSON.pretty_generate JSON.parse request.body.read
       end
       204
+    end
+
+    def promote_dry_run(mapping, reverse)
+      source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
+      result = { success: true, message: 'Dry run successful' }
+      if has_changes path_to source + '/...' or has_changes path_to destination + '/...'
+        result = { success: false, message: 'Cannot promote changes from ' + source + ' to '+ destination + ': there are pending changes' }
+      elsif (try p4integrate mapping, reverse).include? 'No permission for operation'
+        result = { success: false, message: 'You are not allowed to promote changes from ' + source + ' to '+ destination }
+      elsif (try p4resolve destination, 'am').include? 'conflict'
+        result = { success: false, message: 'Unable to promote changes: there are conflicts' }
+      end
+      try p4revert path_to destination + '/...'
+      result
     end
 
     def promote(mapping, reverse)
