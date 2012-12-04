@@ -168,8 +168,7 @@ module AppCfg
 
     def promote(mapping, reverse)
       source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
-      if !File.exists? path_to source or !File.exists? path_to destination or
-          (try p4integrate mapping, reverse).include? 'No permission for operation'
+      if (try p4integrate mapping, reverse).include? 'No permission for operation'
         error 401, 'You are not allowed to promote changes from ' + destination + ' to '+ source
       end
       view = :promote_result
