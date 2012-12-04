@@ -2,10 +2,5 @@
 
 <h2>Promotion Result</h2>
 
-<% if reverse %>
-<% from, to = (mapping.split '-').reverse! %>
-<% else %>
-<% from, to = mapping.split '-' %>
-<% end %>
-<p>Successfully promoted changes from <%= from %> to <%= to %>.
+<p>Successfully promoted changes from <%= source %> to <%= destination %>.
     <strong style="font-size: 120%;">Review your changes before you commit.</strong></p>

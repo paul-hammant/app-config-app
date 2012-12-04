@@ -19,7 +19,7 @@ module AppCfg
 
     def ensure_escaped(resource)
       if /[\t\f\r\n\a&\|<>:;\*\?!%\$\^`~@#\[\]\(\)\{\}\+=\\]/.match resource or
-          resource.include? '..' or (resource.include? '"' and resource.include? "'")
+          /[^\.]\.\.[^\.]/.match resource or (resource.include? '"' and resource.include? "'")
         raise 'Resource contains invalid characters'
       elsif resource.include? "'"
         "\"#{resource}\""

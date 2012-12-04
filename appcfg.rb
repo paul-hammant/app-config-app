@@ -167,12 +167,24 @@ module AppCfg
     end
 
     def promote(mapping, reverse)
+      source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
       try p4integrate mapping, reverse
-      try p4resolve mapping.split('-')[reverse ? 0 : 1], 'at'
-      erb :promote_result, layout: !request.xhr?, locals: {
-          mapping: mapping,
-          reverse: reverse,
-      }
+      if (try p4resolve destination, 'am').include? 'conflict'
+        try p4revert path_to destination + '/...'
+        erb :promote_conflict, layout: !request.xhr?, locals: {
+            mapping: mapping,
+            reverse: reverse,
+            source: source,
+            destination: destination,
+        }
+      else
+        erb :promote_result, layout: !request.xhr?, locals: {
+            mapping: mapping,
+            reverse: reverse,
+            source: source,
+            destination: destination,
+        }
+      end
     end
   end
 
