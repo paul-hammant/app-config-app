@@ -65,11 +65,6 @@ module AppCfg
       try p4commit message
     end
 
-    post '/push' do
-      content_type 'text/html', :charset => 'utf-8'
-      %x[git push | aha --no-header]
-    end
-
     post '/revert/*' do
       resource = params[:splat][0]
       try p4revert path_to resource
