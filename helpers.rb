@@ -125,12 +125,16 @@ module AppCfg
         message, code = message
       end
       if code != 0
-        request.logger.error message
-        flash[:status] = 500
-        flash[:error] = message
-        redirect '/error'
+        error 500, message
       end
       message
+    end
+
+    def error(code = 500, message)
+      request.logger.error message
+      flash[:status] = code
+      flash[:error] = message
+      redirect '/error'
     end
 
     def working_copy

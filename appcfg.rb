@@ -168,23 +168,21 @@ module AppCfg
 
     def promote(mapping, reverse)
       source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
-      try p4integrate mapping, reverse
+      if !File.exists? path_to source or !File.exists? path_to destination or
+          (try p4integrate mapping, reverse).include? 'No permission for operation'
+        error 401, 'You are not allowed to promote changes from ' + destination + ' to '+ source
+      end
+      view = :promote_result
+      locals = {
+          mapping: mapping,
+          source: source,
+          destination: destination,
+      }
       if (try p4resolve destination, 'am').include? 'conflict'
         try p4revert path_to destination + '/...'
-        erb :promote_conflict, layout: !request.xhr?, locals: {
-            mapping: mapping,
-            reverse: reverse,
-            source: source,
-            destination: destination,
-        }
-      else
-        erb :promote_result, layout: !request.xhr?, locals: {
-            mapping: mapping,
-            reverse: reverse,
-            source: source,
-            destination: destination,
-        }
+        view = :promote_conflict
       end
+      erb view, layout: !request.xhr?, locals: locals
     end
   end
 
