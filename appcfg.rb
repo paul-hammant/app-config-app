@@ -102,11 +102,13 @@ module AppCfg
       mappings = (try p4branches).split(' ').select { |x| x.include? '-' }
       array = []
       mappings.each do |x|
-        bm = x.split('-')
-        next unless (File.exists? path_to bm[0]) and (File.exists? path_to bm[1])
+        source, destination = x.split('-')
+        next unless (File.exists? path_to source) and (File.exists? path_to destination)
         array << {
-            :from => bm[0],
-            :to => bm[1]
+            from: source,
+            to: destination,
+            has_changes: (has_changes path_to source + '/...' or
+                has_changes path_to destination + '/...'),
         }
       end
       array.to_json
@@ -168,8 +170,10 @@ module AppCfg
 
     def promote(mapping, reverse)
       source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
-      if (try p4integrate mapping, reverse).include? 'No permission for operation'
-        error 401, 'You are not allowed to promote changes from ' + destination + ' to '+ source
+      if has_changes path_to source + '/...' or has_changes path_to destination + '/...'
+        error 500, 'Cannot promote changes from ' + source + ' to '+ destination + ': there are pending changes'
+      elsif (try p4integrate mapping, reverse).include? 'No permission for operation'
+        error 401, 'You are not allowed to promote changes from ' + source + ' to '+ destination
       end
       view = :promote_result
       locals = {

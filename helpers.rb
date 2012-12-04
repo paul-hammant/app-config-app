@@ -92,6 +92,10 @@ module AppCfg
       [%x[#{p4 username, password} sync 2>&1], $?]
     end
 
+    def p4fstat(path)
+      [%x[#{p4} fstat #{ensure_escaped path} 2>&1], $?]
+    end
+
     def parse_diffs(diffs)
       files = []
       diffs.lines.each do |line|
@@ -135,6 +139,10 @@ module AppCfg
       flash[:status] = code
       flash[:error] = message
       redirect '/error'
+    end
+
+    def has_changes(path)
+      (try p4fstat path).include? 'action edit'
     end
 
     def working_copy
