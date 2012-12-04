@@ -107,8 +107,8 @@ module AppCfg
         array << {
             from: source,
             to: destination,
-            has_changes: (has_changes path_to source + '/...' or
-                has_changes path_to destination + '/...'),
+            from_has_changes: (has_changes path_to source + '/...'),
+            to_has_changes: (has_changes path_to destination + '/...'),
         }
       end
       array.to_json

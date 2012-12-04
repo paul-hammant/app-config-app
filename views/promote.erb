@@ -39,16 +39,18 @@
         </thead>
         <tbody>
             <tr data-ng-repeat="mapping in mappings">
-                <td align="right">{{mapping.from}}</td>
+                <td align="right">{{mapping.from}}<span data-ng-show="mapping.from_has_changes">*</span></td>
                 <td><form action="/promote/{{mapping.from}}-{{mapping.to}}/reverse" method="post">
-                    <input type="submit" value="&lt;" data-ng-disabled="mapping.has_changes"/>
+                    <input type="submit" value="&lt;" data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"/>
                 </form></td>
                 <td><form action="/promote/{{mapping.from}}-{{mapping.to}}" method="post">
-                    <input type="submit" value="&gt;" data-ng-disabled="mapping.has_changes"/>
+                    <input type="submit" value="&gt;" data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"/>
                 </form></td>
-                <td>{{mapping.to}}</td>
+                <td>{{mapping.to}}<span data-ng-show="mapping.to_has_changes">*</span></td>
             </tr>
         </tbody>
     </table>
+
+    <p>*Has pending changes</p>
 
 </div>
