@@ -15,11 +15,11 @@
     function PromoteChangesController($scope, $http, ChangeMappings) {
         $scope.dryRunOnly = false;
         $scope.mappings = ChangeMappings.get();
-
         $scope.dryRun = function (mapping, reverse) {
-            $http.post("/promote/" + mapping.from + "-" + mapping.to + "?dry_run=true" + (reverse ? "&reverse=true" : "")).success(function (response) {
-                alert(response.message);
-            });
+            $http.post("/promote/" + mapping.from + "-" + mapping.to + "?dry_run=true" + (reverse ? "&reverse=true" : ""))
+                .success(function (response) {
+                    alert(response.message);
+                });
         }
     }
 
