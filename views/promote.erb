@@ -16,7 +16,7 @@
         $scope.mappings = ChangeMappings.get();
 
         $scope.dryRun = function (mapping, reverse) {
-            $http.post("/promote/" + mapping.from + "-" + mapping.to + "?dry_run=true").success(function (response) {
+            $http.post("/promote/" + mapping.from + "-" + mapping.to + "?dry_run=true" + (reverse ? "&reverse=true" : "")).success(function (response) {
                 alert(response.message);
             });
         }
