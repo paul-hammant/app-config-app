@@ -23,6 +23,7 @@
             </nav>
         </header>
         <section class="content">
+            <p id="user-info">[Logged in as <%= session[:username] %>]</p>
             <%= yield %>
         </section>
     </div>

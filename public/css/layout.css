@@ -30,6 +30,10 @@ header h1 {
     margin: 3px 12px;
 }
 
+#user-info {
+    float: right;
+}
+
 nav ul {
     margin: 0;
     padding: 6px 12px 4px;
