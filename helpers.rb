@@ -177,7 +177,7 @@ module AppCfg
       elsif entry[:name].include? '.html'
         output += '<li>'
         output += '<a href="' + (entry[:path].sub /^#{Regexp.escape working_copy}\//, '') + '">'
-        output += entry[:name] + '</a>'
+        output += (entry[:name].sub /html$/, 'json') + '</a>'
         output += '</li>' + "\n"
       end
       output
