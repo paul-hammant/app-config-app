@@ -13,6 +13,7 @@
     <div id="wrapper">
         <header>
             <h1>App-Config-App | <%= h (yield_content :title).strip %></h1>
+            <p id="user-info">[Logged in as <%= session[:username] %>]</p>
             <nav>
                 <ul>
                     <li><a href="/">Home</a></li>
@@ -23,7 +24,6 @@
             </nav>
         </header>
         <section class="content">
-            <p id="user-info">[Logged in as <%= session[:username] %>]</p>
             <%= yield %>
         </section>
     </div>

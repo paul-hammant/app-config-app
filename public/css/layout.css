@@ -28,13 +28,18 @@ body {
 header h1 {
     font-variant: small-caps;
     margin: 3px 12px;
+    float: left;
 }
 
 #user-info {
     float: right;
 }
 
-nav ul {
+header nav {
+    clear: both;
+}
+
+header nav ul {
     margin: 0;
     padding: 6px 12px 4px;
     background: linear-gradient(to bottom, rgba(197,222,234,1) 0%,rgba(138,187,215,1) 31%,rgba(6,109,171,1) 100%);
@@ -45,20 +50,20 @@ nav ul {
     border-radius: 6px;
 }
 
-nav li {
+header nav li {
     display: inline-block;
     list-style: none;
     margin: 2px 6px;
     padding: 0;
 }
 
-nav li a {
+header nav li a {
     color: #fdfeff;
     font-weight: bold;
     text-decoration: none;
 }
 
-nav li a:hover, nav li a:active {
+header nav li a:hover, header nav li a:active {
     text-decoration: underline;
 }
 
