@@ -109,7 +109,7 @@ module AppCfg
           try p4revert path_to destination + '/...'
         end
       end
-      if (params[:dryRun])
+      if params[:dryRun]
         try p4revert path_to destination + '/...'
       end
       promote_value = result
