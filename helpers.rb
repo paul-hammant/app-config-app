@@ -81,11 +81,19 @@ module AppCfg
     end
 
     def p4integrate(mapping, reverse = false)
-      [%x[#{p4} integrate -b #{mapping} #{reverse ? '-r' : ''} 2>&1], $?]
+      cmd = "#{p4} integrate -b #{mapping} #{reverse ? '-r' : ''} 2>&1"
+      puts cmd
+      op, code = [%x[#{cmd}], $?]
+      puts [op, code]
+      [op, code]
     end
 
     def p4resolve(environment, accept)
-      [%x[#{p4} resolve -#{accept} #{path_to environment}/... 2>&1], $?]
+      cmd = "#{p4} resolve -#{accept} #{path_to environment}/... 2>&1"
+      puts cmd
+      op, code = [%x[#{cmd}], $?]
+      puts [op, code]
+      [op, code]
     end
 
     def p4sync(username = nil, password = nil)

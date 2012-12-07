@@ -14,9 +14,10 @@
 
     function PromoteChangesController($scope, $http, ChangeMappings) {
         $scope.dryRunOnly = false;
+        $scope.recordOnly = false;
         $scope.mappings = ChangeMappings.get();
-        $scope.dryRun = function (mapping, reverse) {
-            $http.post("/promote/" + mapping.from + "-" + mapping.to + "?dry_run=true" + (reverse ? "&reverse=true" : ""))
+        $scope.merge = function (mapping, reverse) {
+            $http.post("/promote/" + mapping.from + "-" + mapping.to + "?dry_run=" + $scope.dryRunOnly +  (reverse ? "&reverse=true" : "") + ($scope.recordOnly ? "&recordOnly=true" : ""))
                 .success(function (response) {
                     alert(response.message);
                 });
@@ -42,21 +43,12 @@
             <tr data-ng-repeat="mapping in mappings">
                 <td align="right">{{mapping.from}}<span data-ng-show="mapping.from_has_changes">*</span></td>
                 <td>
-                    <form data-ng-show="!dryRunOnly" action="/promote/{{mapping.from}}-{{mapping.to}}" method="post">
-                        <input type="hidden" name="reverse" value="true"/>
-                        <input type="submit" value="&lt;" data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"/>
-                    </form>
-                    <button data-ng-show="dryRunOnly"
-                            data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"
-                            data-ng-click="dryRun(mapping, true)">&lt;</button>
+                    <button data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"
+                            data-ng-click="merge(mapping, true)">&lt;</button>
                 </td>
                 <td>
-                    <form data-ng-show="!dryRunOnly" action="/promote/{{mapping.from}}-{{mapping.to}}" method="post">
-                        <input type="submit" value="&gt;" data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"/>
-                    </form>
-                    <button data-ng-show="dryRunOnly"
-                            data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"
-                            data-ng-click="dryRun(mapping, false)">&gt;</button>
+                    <button data-ng-disabled="mapping.from_has_changes || mapping.to_has_changes"
+                            data-ng-click="merge(mapping, false)">&gt;</button>
                 </td>
                 <td>{{mapping.to}}<span data-ng-show="mapping.to_has_changes">*</span></td>
             </tr>
@@ -65,6 +57,8 @@
 
     <p><input type="checkbox" id="dryRunOnly" data-ng-model="dryRunOnly"/>
         <label for="dryRunOnly">Dry Run Only</label></p>
+    <p><input type="checkbox" id="recordOnly" data-ng-model="recordOnly"/>
+        <label for="dryRunOnly">Record Only</label></p>
     <p>*Has pending changes</p>
 
 </div>

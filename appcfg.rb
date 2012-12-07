@@ -86,12 +86,34 @@ module AppCfg
     end
 
     post '/promote/:mapping' do
-      if params[:dry_run].nil?
-        promote params[:mapping], !params[:reverse].nil?
+      content_type 'application/json'
+      mapping = params[:mapping]
+      reverse = !params[:reverse].nil?
+      source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
+      result = {success: true, message: (params[:dryRun] ? 'Dry run successful' : 'Promotion successful, please check pending changes and commit')}
+      if has_changes path_to source + '/...' or has_changes path_to destination + '/...'
+        result = {success: false, message: 'Cannot promote changes from ' + source + ' to '+ destination + ': there are pending changes'}
       else
-        content_type 'application/json'
-        JSON.generate promote_dry_run params[:mapping], !params[:reverse].nil?
+        message = try p4integrate mapping, reverse
+        if message.include? 'No permission for operation'
+          result = {success: false, message: 'You are not allowed to promote changes from ' + source + ' to '+ destination}
+        elsif message.include? 'already integrated'
+          result = {success: true, message: 'There are no changes to promote'}
+        else
+          op = try p4resolve destination, (params[:recordOnly]? 'at' : 'am')
+          /(\d+) conflicting/.match (op)
+          conflicts = Regexp.last_match(1)
+          if conflicts != '0'
+            result = {success: false, message: 'Unable to promote changes: there are conflicts\n\nPerforce output:\n' + op}
+          end
+          try p4revert path_to destination + '/...'
+        end
       end
+      if (params[:dryRun])
+        try p4revert path_to destination + '/...'
+      end
+      promote_value = result
+      JSON.generate promote_value
     end
 
     get '/change_mappings.json' do
@@ -164,47 +186,7 @@ module AppCfg
       204
     end
 
-    def promote_dry_run(mapping, reverse)
-      source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
-      result = { success: true, message: 'Dry run successful' }
-      if has_changes path_to source + '/...' or has_changes path_to destination + '/...'
-        result = { success: false, message: 'Cannot promote changes from ' + source + ' to '+ destination + ': there are pending changes' }
-      else
-        message = try p4integrate mapping, reverse
-        if message.include? 'No permission for operation'
-          result = { success: false, message: 'You are not allowed to promote changes from ' + source + ' to '+ destination }
-        elsif message.include? 'already integrated'
-          result = { success: true, message: 'There are no changes to promote' }
-        elsif (try p4resolve destination, 'ay').include? 'conflict'
-          result = { success: false, message: 'Unable to promote changes: there are conflicts' }
-        end
-      end
-      try p4revert path_to destination + '/...'
-      result
-    end
 
-    def promote(mapping, reverse)
-      source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
-      if has_changes path_to source + '/...' or has_changes path_to destination + '/...'
-        error 500, 'Cannot promote changes from ' + source + ' to '+ destination + ': there are pending changes'
-      end
-      view = :promote_result
-      locals = {
-          mapping: mapping,
-          source: source,
-          destination: destination,
-      }
-      message = try p4integrate mapping, reverse
-      if message.include? 'No permission for operation'
-        error 401, 'You are not allowed to promote changes from ' + source + ' to '+ destination
-      elsif message.include? 'already integrated'
-        view = :promote_no_changes
-      elsif (try p4resolve destination, 'ay').include? 'conflict'
-        try p4revert path_to destination + '/...'
-        view = :promote_conflict
-      end
-      erb view, layout: !request.xhr?, locals: locals
-    end
   end
 
   class ErrorApp < BaseApp
