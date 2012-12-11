@@ -73,6 +73,12 @@ module AppCfg
       }
     end
 
+    get '/revs/*' do
+      content_type 'application/json'
+      message = try p4filelog path_to params[:splat][0]
+      JSON.generate message.scan(/#(\d+) change/)
+    end
+
     post '/sync' do
       message, code = p4sync
       erb :sync, layout: !request.xhr?, locals: {

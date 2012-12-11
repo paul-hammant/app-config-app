@@ -80,6 +80,10 @@ module AppCfg
       [%x[#{p4} branches 2>&1], $?]
     end
 
+    def p4filelog(resource)
+      [%x[#{p4} filelog -l #{ensure_escaped resource} 2>&1], $?]
+    end
+
     def p4integrate(mapping, reverse = false)
       cmd = "#{p4} integrate -b #{mapping} #{reverse ? '-r' : ''} 2>&1"
       puts cmd
