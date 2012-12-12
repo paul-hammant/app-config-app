@@ -9,4 +9,12 @@
 #  c.mock_framework = :flexmock
 # end
 
+require_relative '../../appcfg'
 require 'cucumber/rspec/doubles'
+require 'rack/test'
+require 'capybara/cucumber'
+
+Capybara.app = Rack::URLMap.new({
+    '/' => AppCfg::App,
+    '/error' => AppCfg::ErrorApp,
+})
