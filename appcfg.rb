@@ -73,9 +73,9 @@ module AppCfg
       }
     end
 
-    get '/revs/*' do
+    get '/*.revisions' do
       content_type 'application/json'
-      message = try p4filelog path_to params[:splat][0]
+      message = try p4filelog path_to params[:splat][0] + '.json'
       JSON.generate message.scan(/#(\d+) change/)
     end
 
