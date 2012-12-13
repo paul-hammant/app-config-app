@@ -9,12 +9,25 @@
 #  c.mock_framework = :flexmock
 # end
 
-require_relative '../../appcfg'
+ENV['RACK_ENV'] = 'test'
+
+require 'capybara'
+require 'capybara/cucumber'
 require 'cucumber/rspec/doubles'
 require 'rack/test'
-require 'capybara/cucumber'
+require 'rspec/expectations'
 
-Capybara.app = Rack::URLMap.new({
-    '/' => AppCfg::App,
-    '/error' => AppCfg::ErrorApp,
-})
+class SinatraWorld
+  require 'selenium-webdriver'
+  Capybara.default_driver = :selenium
+
+# use the rackup file to load the apps w/their respective URL mappings, sweet!
+  Capybara.app = eval "Rack::Builder.new {( " + File.read(File.dirname(__FILE__) + '/../../config.ru') + "\n )}"
+
+  include Capybara::DSL
+  include RSpec::Expectations
+end
+
+World do
+  SinatraWorld.new
+end
