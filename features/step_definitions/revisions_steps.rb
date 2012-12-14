@@ -9,11 +9,15 @@ class CardboardBox
 end
 
 Given /^I have a cardboard box$/ do
-  transmogrifier = double('transmogrifier')
-  transmogrifier.should_receive(:transmogrify)
-  @box = CardboardBox.new(transmogrifier)
+  @transmogrifier = double('transmogrifier')
+  @transmogrifier.should_receive(:transmogrify)
+  @box = CardboardBox.new(@transmogrifier)
 end
 
-When /^I poke it all is good$/ do
+When /^I poke it$/ do
   @box.poke
+end
+
+Then /^all is good$/ do
+  puts 'woot!'
 end

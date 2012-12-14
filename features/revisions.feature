@@ -4,5 +4,5 @@ Feature: Mocking
 
   Scenario: Mock a transmogrifier
     Given I have a cardboard box
-    # Comment out the next line to see a failure
-    When I poke it all is good
+    When I poke it
+    Then all is good
