@@ -162,7 +162,7 @@ module AppCfg
     end
 
     def directory_hash(path, name=nil)
-      name = name || path
+      name ||= path
       entry = {
           path: path,
           name: name,

@@ -94,32 +94,28 @@ module AppCfg
     post '/promote/:mapping' do
       content_type 'application/json'
       mapping = params[:mapping]
-      reverse = !params[:reverse].nil?
+      reverse = (params[:reverse] == 'true')
+      dry_run = (params[:dry_run] == 'true')
+      record_only = (params[:record_only] == 'true')
       source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
-      result = {success: true, message: (params[:dryRun] ? 'Dry run successful' : 'Promotion successful, please check pending changes and commit')}
+      result = { success: true, message: (dry_run ? 'Dry run successful' : 'Promotion successful, please check pending changes and commit') }
       if has_changes path_to source + '/...' or has_changes path_to destination + '/...'
-        result = {success: false, message: 'Cannot promote changes from ' + source + ' to '+ destination + ': there are pending changes'}
+        result = { success: false, message: "Cannot promote changes from #{source} to #{destination}: there are pending changes" }
       else
         message = try p4integrate mapping, reverse
         if message.include? 'No permission for operation'
-          result = {success: false, message: 'You are not allowed to promote changes from ' + source + ' to '+ destination}
+          result = { success: false, message: "You are not allowed to promote changes from #{source} to #{destination}" }
         elsif message.include? 'already integrated'
-          result = {success: true, message: 'There are no changes to promote'}
+          result = { success: true, message: 'There are no changes to promote' }
         else
-          op = try p4resolve destination, (params[:recordOnly]? 'at' : 'am')
-          /(\d+) conflicting/.match (op)
-          conflicts = Regexp.last_match(1)
-          if conflicts != '0'
-            result = {success: false, message: 'Unable to promote changes: there are conflicts\n\nPerforce output:\n' + op}
+          output = try p4resolve destination, (record_only ? 'ay' : 'at')
+          if output.include? 'conflict'
+            result = { success: false, message: "Unable to promote changes: there are conflicts\n\nPerforce output:\n#{output}" }
           end
-          try p4revert path_to destination + '/...'
         end
       end
-      if params[:dryRun]
-        try p4revert path_to destination + '/...'
-      end
-      promote_value = result
-      JSON.generate promote_value
+      try p4revert path_to destination + '/...' if dry_run
+      JSON.generate result
     end
 
     get '/change_mappings.json' do
