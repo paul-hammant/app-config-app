@@ -11,7 +11,6 @@ protect  = %x[p4 -p #{p4port} protect -o].gsub(/^.+write user \* \* \/\/\.\.\./,
 protect += '\t' + "write user #{user} * //depot/app-config-app/..." + '\n\n'
 protect += '\twrite user sally-runtime * //depot/app-config-app/prod/...\n\n'
 protect += '\tread user sally-runtime * //depot/app-config-app/staging/...\n\n'
-protect += '\tread user sally-runtime * //depot/app-config-app/dev/...\n\n'
 protect += '\twrite user joe-developer * //depot/app-config-app/dev/...\n\n'
 protect += '\twrite user jimmy-qa * //depot/app-config-app/staging/...\n\n'
 protect += '\twrite user jimmy-qa * //depot/app-config-app/qa/...\n\n'
