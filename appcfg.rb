@@ -6,6 +6,7 @@ require 'rack/flash'
 require 'singleton'
 require 'yaml'
 require_relative 'helpers'
+require_relative 'svn_helpers'
 
 module AppCfg
   class BaseApp < Sinatra::Application
