@@ -3,4 +3,6 @@
 *.iml
 *.lock
 wc
+*.swp
 perforce_files
+svn_files
