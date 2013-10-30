@@ -1,14 +1,29 @@
+I (Paul) have most likely directed you here because I'm trying to sell you "apps backed by source-control" generally, or "app-config in source-control" specifically which I claims is the gold standard of such things.  Note apps in this context are the things you wrote source for that and are truly unique; they are not infrastructure packages like Postgres or Apache which also have config. 
+
 Application Configuration App
 =============================
 
-Ports to different source-control tools
----------------------------------------
+Ports to different source-control back-ends
+-------------------------------------------
+
+App-Config-App stores config into source-control. Two Implementations so far:
 
 [Git + Github version of app-config-app is on a 'git' branch](https://github.com/paul-hammant/app-config-app/tree/git)
 (Rather a rudimentary version, that serves as the proof of concept) 
 
 [Perforce version of app-config-app is on a 'perforce' branch](https://github.com/paul-hammant/app-config-app/tree/perforce)
-(Logan McGrath did the work, with me as Product Owner and P4 tech consultant)
+(fellow ThoughtWorker Logan McGrath did the work, with I was Product Owner and P4 tech consultant)
+
+Why Source-Control
+------------------
+
+* Is carriage return delimited text
+* Terse diffs (if pretty printed consistently)
+* Suits branching
+* Audit-Trail is helpful
+* Permissions per-branch or even subdirectory (not all impls)
+* Rollback is atomic
+* [Maintained Divergence can be deliberate](http://paulhammant.com/2013/04/02/maintained-divergence/)
 
 Timeline of Blog entries talking about this
 -------------------------------------------
