@@ -1,15 +1,5 @@
-Installation
-------------
+Git + Github version of app-config-app is on a 'git' branch
+(Rather a rudimentary version)
 
-Ruby Gems needed: json & sinatra
-
-AHA (you'll have to build this one from source): https://github.com/theZiz/aha
-
-Jshon: http://kmkeen.com/jshon/ (Homebrew can install this)
-
-Running it
-----------
-
-ruby appcfg.rb
-
-Then crank up your browser, and go to [http://localhost:12345](http://localhost:12345)
+Perforce version of app-config-app is on a 'perforce' branch 
+(Logan McGrath did the work, with me as Product Owner and P4 tech consultant)
