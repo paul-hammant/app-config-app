@@ -8,14 +8,14 @@ module AppCfg
       "#{username || session[:username]}Client"
     end
 
-#    def diffs_for(resource)
-#      diffs = parse_diffs try p4diff resource
-#      if diffs.length and diffs[0]
-#        diffs[0][:diffs]
-#      else
-#        ''
-#      end
-#    end
+    def diffs_for(resource)
+      diffs = parse_diffs try p4diff resource
+      if diffs.length and diffs[0]
+        diffs[0][:diffs]
+      else
+        ''
+      end
+    end
 
     def ensure_escaped(resource)
       if /[\t\f\r\n\a&\|<>:;\*\?!%\$\^`~@#\[\]\(\)\{\}\+=\\]/.match resource or

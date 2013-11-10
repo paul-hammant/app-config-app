@@ -49,9 +49,9 @@ module AppCfg
 
     def svn(command, user, password)
       command_output = `svn #{command} svn://localhost \
-         --non-interactive --no-auth-cache \
-         --username #{user} --password #{password} \
-         2>&1 #{working_copy(user)}`
+        --non-interactive --no-auth-cache \
+        --username #{user} --password #{password} \
+        2>&1 #{working_copy(user)}`
 
       { command_output: command_output,
         exit_code: $? }
@@ -61,8 +61,30 @@ module AppCfg
       svn('checkout', user, password)[:exit_code] == 0
     end
 
+    def scm_commit(user, password, message)
+      command_output = `svn commit -m "#{message}" \
+        --non-interactive --no-auth-cache \
+        --username #{user} --password #{password} \
+        2>&1 #{working_copy(user)}`
+
+      { command_output: command_output,
+        exit_code: $? }
+    end
+
+    def scm_diff(user, file = nil)
+      command_output = `svn diff #{file || working_copy(user)} 2>%1`
+      { command_output: command_output,
+        exit_code: $? }
+    end
+
+    def scm_revert(resource)
+      command_output = `svn revert #{resource} 2>&1`
+      { command_output: command_output,
+        exit_code: $? }
+    end
+
     def sync
-      return false unless session[:user]
+      return unless session[:user]
 
       time = Time.now.to_i
 
@@ -70,6 +92,31 @@ module AppCfg
         scm_sync(session[:user], session[:password])
         session[:last_sync] = time
         request.logger.debug 'Performed Sync'
+      end
+    end
+
+    def parse_diffs(diffs)
+      files = []
+      diffs.lines.each do |line|
+        if /Index: #{Regexp.escape(working_copy(session[:user]))}\/(.+)$/.match line
+          files.push({
+            filename: Regexp.last_match(1),
+            diffs: '',
+          })
+        elsif files[-1] && /\+  |-  /.match(line)
+          files[-1][:diffs] += line
+        end
+      end
+      files
+    end
+
+    def diffs_for(resource)
+      raw_diffs = scm_diff(session[:user], resource)[:command_output]
+      diffs = parse_diffs(raw_diffs)
+      if diffs.length and diffs[0]
+        diffs[0][:diffs]
+      else
+        ''
       end
     end
   end

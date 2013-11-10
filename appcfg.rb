@@ -19,6 +19,8 @@ module AppCfg
     configure do
       enable :sessions
     end
+
+    set :lock, true
   end
 
   class App < BaseApp
@@ -55,19 +57,19 @@ module AppCfg
 
     get '/changes' do
       erb :changes, locals: {
-          edited_files: (parse_diffs try p4diff)
+        edited_files: parse_diffs(scm_diff(session[:user])[:command_output])
       }
     end
 
     post '/commit' do
       message = request.xhr? ? (JSON.parse request.body.read)['message'] : request[:message]
       raise 'No message entered' if message.nil? or message.length == 0
-      try p4commit message
+      scm_commit(session[:user], session[:password], message)[:command_output]
     end
 
     post '/revert/*' do
       resource = params[:splat][0]
-      try p4revert path_to resource
+      scm_revert(path_to(resource))
       erb :revert, layout: !request.xhr?, locals: {
           filename: resource
       }
@@ -155,19 +157,19 @@ module AppCfg
     get '/*.md5' do
       sync
       content_type 'text/plain'
-      #File.open(path_to params[:splat][0] + '.json') { |file| Digest::MD5.hexdigest file.read }
+      File.open(path_to params[:splat][0] + '.json') { |file| Digest::MD5.hexdigest file.read }
     end
 
     get '/*.js' do
       sync
       content_type 'text/javascript'
-      #File.open(path_to params[:splat][0]) { |file| file.read }
+      File.open(path_to params[:splat][0]) { |file| file.read }
     end
 
     get '/*.changed' do
       sync
       content_type 'text/plain'
-      #(diffs_for path_to params[:splat][0] + '.json') == '' ? 'false' : 'true'
+      (diffs_for path_to params[:splat][0] + '.json') == '' ? 'false' : 'true'
     end
 
     get '/*.diffs' do
@@ -181,14 +183,11 @@ module AppCfg
 
     post '/*.json' do
       resource = path_to params[:splat][0] + '.json'
-      try p4edit resource
       File.open resource, 'w+' do |file|
         file.write JSON.pretty_generate JSON.parse request.body.read
       end
       204
     end
-
-
   end
 
   class ErrorApp < BaseApp
