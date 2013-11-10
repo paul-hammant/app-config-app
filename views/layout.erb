@@ -13,7 +13,7 @@
     <div id="wrapper">
         <header>
             <h1>App-Config-App | <%= h (yield_content :title).strip %></h1>
-            <p id="user-info">[Logged in as <%= session[:username] %>
+            <p id="user-info">[Logged in as <%= session[:user] %>
                 | <a href="<%= request.url.sub /:\/\//, '://logout@' %>">Logout</a>]</p>
             <nav>
                 <ul>

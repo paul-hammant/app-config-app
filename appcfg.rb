@@ -5,7 +5,7 @@ require 'json'
 require 'rack/flash'
 require 'singleton'
 require 'yaml'
-require_relative 'helpers'
+#require_relative 'helpers'
 require_relative 'svn_helpers'
 
 module AppCfg
@@ -24,10 +24,9 @@ module AppCfg
   class App < BaseApp
     extend Helpers
 
-    use Rack::Auth::Basic, 'Protected Area' do |username, password|
-      _, code = p4sync username, password
-      if code == 0
-        Thread.current[:username] = username
+    use Rack::Auth::Basic, 'Protected Area' do |user, password|
+      if are_valid_scm_credentials?(user, password)
+        Thread.current[:user] = user
         Thread.current[:password] = password
         true
       else
@@ -36,7 +35,7 @@ module AppCfg
     end
 
     before do
-      [:username, :password].each do |key|
+      [:user, :password].each do |key|
         session[key] = Thread.current[key]
         Thread.current[key] = nil
       end
@@ -50,7 +49,7 @@ module AppCfg
     get '/' do
       sync
       erb :config_forms, locals: {
-          forms: (directory_hash working_copy),
+        forms: directory_hash(working_copy(session[:user])),
       }
     end
 
@@ -156,19 +155,19 @@ module AppCfg
     get '/*.md5' do
       sync
       content_type 'text/plain'
-      File.open(path_to params[:splat][0] + '.json') { |file| Digest::MD5.hexdigest file.read }
+      #File.open(path_to params[:splat][0] + '.json') { |file| Digest::MD5.hexdigest file.read }
     end
 
     get '/*.js' do
       sync
       content_type 'text/javascript'
-      File.open(path_to params[:splat][0]) { |file| file.read }
+      #File.open(path_to params[:splat][0]) { |file| file.read }
     end
 
     get '/*.changed' do
       sync
       content_type 'text/plain'
-      (diffs_for path_to params[:splat][0] + '.json') == '' ? 'false' : 'true'
+      #(diffs_for path_to params[:splat][0] + '.json') == '' ? 'false' : 'true'
     end
 
     get '/*.diffs' do
