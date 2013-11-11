@@ -71,6 +71,19 @@ module AppCfg
         exit_code: $? }
     end
 
+    def scm_merge(source, destination, user, password)
+      command_output = `svn merge \
+        ^/#{source} \
+        #{working_copy(user)}/#{destination} \
+        --non-interactive --no-auth-cache \
+        --ignore-ancestry \
+        --username #{user} --password #{password} \
+        2>&1`
+
+      { command_output: command_output,
+        exit_code: $? }
+    end
+
     def scm_diff(user, file = nil)
       command_output = `svn diff #{file || working_copy(user)} 2>%1`
       { command_output: command_output,
@@ -79,6 +92,13 @@ module AppCfg
 
     def scm_revert(resource)
       command_output = `svn revert #{resource} 2>&1`
+      { command_output: command_output,
+        exit_code: $? }
+    end
+
+    def scm_status(path)
+      command_output = `svn status #{path} 2>&1`
+
       { command_output: command_output,
         exit_code: $? }
     end
@@ -105,9 +125,15 @@ module AppCfg
           })
         elsif files[-1] && /\+  |-  /.match(line)
           files[-1][:diffs] += line
+        elsif files[-1] && /Property/.match(line)
+          files[-1][:diffs] += "Merge Metadata"
         end
       end
       files
+    end
+
+    def has_changes?(path)
+      output = scm_status(path)[:command_output].include? 'M'
     end
 
     def diffs_for(resource)

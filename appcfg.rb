@@ -62,7 +62,7 @@ module AppCfg
     end
 
     post '/commit' do
-      message = request.xhr? ? (JSON.parse request.body.read)['message'] : request[:message]
+      message = request.xhr? ? JSON.parse(request.body.read) : request[:message]
       raise 'No message entered' if message.nil? or message.length == 0
       scm_commit(session[:user], session[:password], message)[:command_output]
     end
@@ -95,42 +95,41 @@ module AppCfg
 
     post '/promote/:mapping' do
       content_type 'application/json'
+
       mapping = params[:mapping]
       reverse = (params[:reverse] == 'true')
       dry_run = (params[:dry_run] == 'true')
       record_only = (params[:record_only] == 'true')
+
       source, destination = reverse ? (mapping.split '-').reverse! : (mapping.split '-')
+
       result = { success: true, message: (dry_run ? 'Dry run successful' : 'Promotion successful, please check pending changes and commit') }
-      if has_changes path_to source + '/...' or has_changes path_to destination + '/...'
+
+      if has_changes? path_to source or has_changes? path_to destination
         result = { success: false, message: "Cannot promote changes from #{source} to #{destination}: there are pending changes" }
       else
-        message = try p4integrate mapping, reverse
-        if message.include? 'No permission for operation'
-          result = { success: false, message: "You are not allowed to promote changes from #{source} to #{destination}" }
-        elsif message.include? 'already integrated'
-          result = { success: true, message: 'There are no changes to promote' }
-        else
-          output = try p4resolve destination, (record_only ? 'ay' : 'at')
-          if output.include? 'conflict'
-            result = { success: false, message: "Unable to promote changes: there are conflicts\n\nPerforce output:\n#{output}" }
-          end
+        message = scm_merge(source, destination,
+          session[:user], session[:password])[:command_output]
+
+        if message.include? 'conflict'
+          result = { success: false, message: "Unable to promote changes: there are conflicts\n\nSVN output:\n#{message}" }
         end
       end
-      try p4revert path_to destination + '/...' if dry_run
+
       JSON.generate result
     end
 
     get '/change_mappings.json' do
-      mappings = (try p4branches).split(' ').select { |x| x.include? '-' }
+      mappings = ['dev-qa', 'qa-staging', 'staging-prod'] # This can be read from a file later
       array = []
       mappings.each do |x|
         source, destination = x.split('-')
-        next unless (File.exists? path_to source) and (File.exists? path_to destination)
+        next unless File.exists?(path_to(source)) and File.exists?(path_to(destination))
         array << {
-            from: source,
-            to: destination,
-            from_has_changes: (has_changes path_to source + '/...'),
-            to_has_changes: (has_changes path_to destination + '/...'),
+          from: source,
+          to: destination,
+          from_has_changes: has_changes?(path_to(source)),
+          to_has_changes: has_changes?(path_to(destination)),
         }
       end
       array.to_json
