@@ -3,16 +3,22 @@ I (Paul) have most likely directed you here because I'm trying to sell you "apps
 Application Configuration App
 =============================
 
+App-Config-App stores config into source-control.  This suits one-branch-per-environment and merge point tracking as a way of being assured of correct config promotion.
+
 Ports to different source-control back-ends
 -------------------------------------------
 
-App-Config-App stores config into source-control. Two Implementations so far:
+Two working implementations so far:
 
 [Git + Github version of app-config-app is on a 'git' branch](https://github.com/paul-hammant/app-config-app/tree/git)
 (Rather a rudimentary version, that serves as the proof of concept) 
 
 [Perforce version of app-config-app is on a 'perforce' branch](https://github.com/paul-hammant/app-config-app/tree/perforce)
 (fellow ThoughtWorker Logan McGrath did the work, with I was Product Owner and P4 tech consultant)
+
+One half-working implementation too:
+
+[Subvesion version of app-config-app is on a 'subversion' branch](https://github.com/paul-hammant/app-config-app/tree/subversion)
 
 Why Source-Control
 ------------------
@@ -28,16 +34,20 @@ Why Source-Control
 Timeline of Blog entries talking about this
 -------------------------------------------
 
+(chronalogical order)
+
 [http://paulhammant.com/2012/07/10/app-config-workflow-using-scm](http://paulhammant.com/2012/07/10/app-config-workflow-using-scm)
 [http://paulhammant.com/2012/08/14/app-config-using-git-and-angular](http://paulhammant.com/2012/08/14/app-config-using-git-and-angular)
 [http://loganmcgrath.com/blog/2012/11/07/using-perforce-chronicle-for-application-configuration](http://loganmcgrath.com/blog/2012/11/07/using-perforce-chronicle-for-application-configuration)
 [http://loganmcgrath.com/blog/2012/11/16/scm-backed-application-configuration-with-perforce](http://loganmcgrath.com/blog/2012/11/16/scm-backed-application-configuration-with-perforce)
-[http://loganmcgrath.com/blog/2012/11/20/app-config-app-in-action](http://loganmcgrath.com/blog/2012/11/20/app-config-app-in-action)
-[http://loganmcgrath.com/blog/2012/11/28/promoting-changes-with-app-config-app](http://loganmcgrath.com/blog/2012/11/28/promoting-changes-with-app-config-app)
+[http://loganmcgrath.com/blog/2012/11/20/app-config-app-in-action](http://loganmcgrath.com/blog/2012/11/20/app-config-app-in-action) *
+[http://loganmcgrath.com/blog/2012/11/28/promoting-changes-with-app-config-app](http://loganmcgrath.com/blog/2012/11/28/promoting-changes-with-app-config-app) *
 [http://paulhammant.com/2013/01/08/perforce-as-a-datastore-with-client-side-mvc](http://paulhammant.com/2013/01/08/perforce-as-a-datastore-with-client-side-mvc)
 
-Invariant Technologies
-----------------------
+* has detailed videos of app in action.
+
+Invariant Technologies between ports
+------------------------------------
 
 [AngularJS](http://angularjs.org) (JavaScript): we're scotch-taping fragments of it into a...
 
