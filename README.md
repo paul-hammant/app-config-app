@@ -1,4 +1,4 @@
-I (Paul) have most likely directed you here because I'm trying to sell you "apps backed by source-control" generally, or "app-config in source-control" specifically which I claim is the gold standard of such things.  Note apps in this context are the things you wrote source for that and are truly unique; they are not infrastructure packages like Postgres or Apache which also have config. 
+I (Paul) have most likely directed you here because I'm trying to sell you "app config backed by source-control" generally, or "app-config in source-control" specifically which I claim is the gold standard of such things.  Note apps in this context are the things you wrote source for that and are truly unique; they are not infrastructure packages like Postgres or Apache which also have config. 
 
 Application Configuration App
 =============================
