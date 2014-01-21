@@ -3,7 +3,13 @@ I (Paul) have most likely directed you here because I'm trying to sell you "app 
 Application Configuration App
 =============================
 
-App-Config-App stores config into source-control.  This suits one-branch-per-environment and merge point tracking as a way of being assured of correct config promotion.
+App-Config-App stores shared config into source-control. This suits one-branch-per-environment and merge point tracking as a way of being assured of correct config promotion.
+
+It makes config available over HTTP as JSON.
+
+It provides editing of config, using AngularJS (without a schema), and exposes a 'commit' button in the web page to hanfle the interop to/from source-control for you.  
+
+It is also "round-trip" in that you can also check-out the JSON source files using regular command line tools, edit, and commit back without using the web UI.
 
 Ports to different source-control back-ends
 -------------------------------------------
