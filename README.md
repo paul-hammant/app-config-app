@@ -16,15 +16,15 @@ Ports to different source-control back-ends
 
 Two working implementations so far:
 
-[Git + Github version of app-config-app is on a 'git' branch](https://github.com/paul-hammant/app-config-app/tree/git)
+* [Git + Github version of app-config-app is on a 'git' branch](https://github.com/paul-hammant/app-config-app/tree/git)
 (Rather a rudimentary version, that serves as the proof of concept) 
 
-[Perforce version of app-config-app is on a 'perforce' branch](https://github.com/paul-hammant/app-config-app/tree/perforce)
+* [Perforce version of app-config-app is on a 'perforce' branch](https://github.com/paul-hammant/app-config-app/tree/perforce)
 (fellow ThoughtWorker Logan McGrath did the work, with I was Product Owner and P4 tech consultant)
 
 One half-working implementation too:
 
-[Subvesion version of app-config-app is on a 'subversion' branch](https://github.com/paul-hammant/app-config-app/tree/subversion)
+* [Subvesion version of app-config-app is on a 'subversion' branch](https://github.com/paul-hammant/app-config-app/tree/subversion)
 
 Why Source-Control
 ------------------
