@@ -48,9 +48,9 @@ Timeline of Blog entries talking about this
 2. [http://paulhammant.com/2012/08/14/app-config-using-git-and-angular](http://paulhammant.com/2012/08/14/app-config-using-git-and-angular)
 [http://loganmcgrath.com/blog/2012/11/07/using-perforce-chronicle-for-application-configuration](http://loganmcgrath.com/blog/2012/11/07/using-perforce-chronicle-for-application-configuration)
 3. [http://loganmcgrath.com/blog/2012/11/16/scm-backed-application-configuration-with-perforce](http://loganmcgrath.com/blog/2012/11/16/scm-backed-application-configuration-with-perforce)
-4. [http://loganmcgrath.com/blog/2012/11/20/app-config-app-in-action](http://loganmcgrath.com/blog/2012/11/20/app-config-app-in-action) (This one has a video showing the setting of toggles thru the admin app, and how that affects the "server" in question)
-[http://loganmcgrath.com/blog/2012/11/28/promoting-changes-with-app-config-app](http://loganmcgrath.com/blog/2012/11/28/promoting-changes-with-app-config-app) 
-5. [http://paulhammant.com/2013/01/08/perforce-as-a-datastore-with-client-side-mvc](http://paulhammant.com/2013/01/08/perforce-as-a-datastore-with-client-side-mvc)
+4. [http://loganmcgrath.com/blog/2012/11/20/app-config-app-in-action](http://loganmcgrath.com/blog/2012/11/20/app-config-app-in-action) - features a video showing the setting of toggles thru the admin app, and how that affects the "server" in question
+5. [http://loganmcgrath.com/blog/2012/11/28/promoting-changes-with-app-config-app](http://loganmcgrath.com/blog/2012/11/28/promoting-changes-with-app-config-app) - screen shots of the promotion (merging as done by Perforce)
+6. [http://paulhammant.com/2013/01/08/perforce-as-a-datastore-with-client-side-mvc](http://paulhammant.com/2013/01/08/perforce-as-a-datastore-with-client-side-mvc)
 
 Invariant Technologies between ports
 ------------------------------------
