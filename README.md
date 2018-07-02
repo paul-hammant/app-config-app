@@ -26,7 +26,7 @@ Two working implementations so far:
 
 One half-working implementation too:
 
-* [Subvesion version of app-config-app is on a 'subversion' branch](https://github.com/paul-hammant/app-config-app/tree/subversion)
+* [Subversion version of app-config-app is on a 'subversion' branch](https://github.com/paul-hammant/app-config-app/tree/subversion)
 
 Why Source-Control?
 -------------------
